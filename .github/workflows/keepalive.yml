@@ -1,0 +1,29 @@
+name: Supabase keepalive
+
+# Supabase pauses free-tier projects after ~1 week without traffic.
+# This pings the database twice a week so the planner stays awake.
+# Note: GitHub disables scheduled workflows after 60 days without repo
+# activity — it sends an email first, and one click re-enables them.
+
+on:
+  schedule:
+    - cron: '23 6 * * 1,4' # Mondays & Thursdays 06:23 UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "VITE_SUPABASE_URL variable not set — skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error \
+            "$SUPABASE_URL/rest/v1/trips?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" > /dev/null
+          echo "Supabase is awake 🌞"

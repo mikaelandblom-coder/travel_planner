@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.claude/
+SETUP.html
+.env
+.env.local
+*.local
+.DS_Store
