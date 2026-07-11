@@ -1,0 +1,12 @@
+[
+  {
+    "id": "16ae5276-886e-4962-9c2c-7892e5699598",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-11-14",
+    "from_name": "Stockholm",
+    "to_name": "Saigon",
+    "mode": "flight",
+    "notes": "Flyget går 06:10",
+    "created_at": "2026-07-11T19:48:48.606471+00:00"
+  }
+]
