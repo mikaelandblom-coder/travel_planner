@@ -45,11 +45,11 @@ export function seedData(): DB {
 
   const mkLeg = (
     date: string, from_name: string, to_name: string,
-    mode: Leg['mode'], notes = '',
-  ): Leg => ({ id: uid(), trip_id: tripId, date, from_name, to_name, mode, notes })
+    mode: Leg['mode'], notes = '', arrive_date: string | null = null,
+  ): Leg => ({ id: uid(), trip_id: tripId, date, arrive_date, from_name, to_name, mode, notes })
 
   const legs: Leg[] = [
-    mkLeg('2026-11-12', 'Home', 'Hanoi', 'flight', 'Overnight flight, arrive on the 13th'),
+    mkLeg('2026-11-12', 'Home', 'Hanoi', 'flight', 'Overnight flight', '2026-11-13'),
     mkLeg('2026-11-17', 'Hanoi', 'Ha Long Bay', 'bus', '~2.5 h shuttle'),
     mkLeg('2026-11-19', 'Ha Long Bay', 'Hoi An', 'flight', 'Via Da Nang'),
     mkLeg('2026-11-24', 'Hoi An', 'Ho Chi Minh City', 'flight'),

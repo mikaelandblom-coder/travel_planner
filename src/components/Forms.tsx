@@ -153,6 +153,7 @@ export function LegForm({ initial, defaultDate, onSave, onDelete }: {
   onDelete?: () => void
 }) {
   const [date, setDate] = useState(initial?.date ?? defaultDate ?? '')
+  const [arrive, setArrive] = useState(initial?.arrive_date ?? '')
   const [from, setFrom] = useState(initial?.from_name ?? '')
   const [to, setTo] = useState(initial?.to_name ?? '')
   const [mode, setMode] = useState<TravelMode>(initial?.mode ?? 'flight')
@@ -161,14 +162,21 @@ export function LegForm({ initial, defaultDate, onSave, onDelete }: {
   function submit(e: FormEvent) {
     e.preventDefault()
     if (!date || !from.trim() || !to.trim()) return
-    onSave({ date, from_name: from.trim(), to_name: to.trim(), mode, notes: notes.trim() })
+    let [dep, arr] = arrive ? ordered(date, arrive) : [date, null as string | null]
+    if (arr === dep) arr = null // same day → no separate arrival
+    onSave({ date: dep, arrive_date: arr, from_name: from.trim(), to_name: to.trim(), mode, notes: notes.trim() })
   }
 
   return (
     <form onSubmit={submit}>
-      <Field label="Date">
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} required />
-      </Field>
+      <div className="field-row">
+        <Field label="Departure">
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} required />
+        </Field>
+        <Field label="Arrival (if other day)">
+          <input type="date" value={arrive} onChange={e => setArrive(e.target.value)} />
+        </Field>
+      </div>
       <div className="field-row">
         <Field label="From">
           <input value={from} onChange={e => setFrom(e.target.value)} required placeholder="Hanoi" />

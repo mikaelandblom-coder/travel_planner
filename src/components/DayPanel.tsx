@@ -94,7 +94,7 @@ function DayView(props: Props & { date: string }) {
   const dayStays = data.stays
     .filter(s => s.start_date <= date && date <= s.end_date)
     .sort((a, b) => a.start_date.localeCompare(b.start_date))
-  const dayLegs = data.legs.filter(l => l.date === date)
+  const dayLegs = data.legs.filter(l => l.date === date || l.arrive_date === date)
   const dayN = daysBetween(trip.start_date, date) + 1
   const total = daysBetween(trip.start_date, trip.end_date) + 1
 
@@ -117,6 +117,12 @@ function DayView(props: Props & { date: string }) {
             <strong>{l.to_name}</strong>
             {editMode && <RowActions onEdit={() => props.onEditLeg(l)} onDelete={() => props.onDeleteLeg(l)} />}
           </div>
+          {l.arrive_date && l.arrive_date !== l.date && (
+            <p className="row-sub">
+              Departs {fmtShort(l.date)} · arrives {fmtShort(l.arrive_date)} (+{daysBetween(l.date, l.arrive_date)}{' '}
+              {daysBetween(l.date, l.arrive_date) === 1 ? 'day' : 'days'})
+            </p>
+          )}
           {l.notes && <p className="notes">{l.notes}</p>}
         </div>
       ))}

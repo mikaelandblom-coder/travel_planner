@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'backups/**' # weekly backup commits don't need a redeploy
   workflow_dispatch:
 
 permissions:

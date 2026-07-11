@@ -16,7 +16,7 @@ export function Calendar({ trip, stays, legs, selectedDate, onSelect }: Props) {
   const all = [
     trip.start_date, trip.end_date,
     ...stays.flatMap(s => [s.start_date, s.end_date]),
-    ...legs.map(l => l.date),
+    ...legs.flatMap(l => (l.arrive_date ? [l.date, l.arrive_date] : [l.date])),
   ]
   const min = all.reduce((a, b) => (a < b ? a : b))
   const max = all.reduce((a, b) => (a > b ? a : b))
@@ -57,6 +57,14 @@ export function Calendar({ trip, stays, legs, selectedDate, onSelect }: Props) {
   )
 }
 
+/** Flights spanning days get distinct take-off / landing badges. */
+function legBadge(leg: Leg, iso: string): string {
+  if (leg.mode === 'flight' && leg.arrive_date && leg.arrive_date !== leg.date) {
+    return iso === leg.date ? '🛫' : '🛬'
+  }
+  return modeEmoji(leg.mode)
+}
+
 type MonthProps = {
   year: number
   month: number // 0-based
@@ -79,7 +87,7 @@ function MonthGrid({ year, month, trip, stays, legs, selectedDate, today, onSele
   for (let d = 1; d <= daysInMonth; d++) {
     const iso = `${year}-${pad2(month + 1)}-${pad2(d)}`
     const dayStays = stays.filter(s => s.start_date <= iso && iso <= s.end_date)
-    const dayLegs = legs.filter(l => l.date === iso)
+    const dayLegs = legs.filter(l => l.date === iso || l.arrive_date === iso)
     const inTrip = trip.start_date <= iso && iso <= trip.end_date
     const arriving = dayStays.find(s => s.start_date === iso)
 
@@ -104,7 +112,7 @@ function MonthGrid({ year, month, trip, stays, legs, selectedDate, today, onSele
         title={dayStays.map(s => s.location_name).join(' → ') || undefined}
       >
         <span className="daynum">{d}</span>
-        {dayLegs.length > 0 && <span className="leg-badge">{modeEmoji(dayLegs[0].mode)}</span>}
+        {dayLegs.length > 0 && <span className="leg-badge">{legBadge(dayLegs[0], iso)}</span>}
         {arriving && <span className="day-label">{arriving.location_name}</span>}
       </button>,
     )

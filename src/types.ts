@@ -22,7 +22,8 @@ export type TravelMode = 'flight' | 'train' | 'bus' | 'ferry' | 'car'
 export type Leg = {
   id: string
   trip_id: string
-  date: string
+  date: string // departure day
+  arrive_date: string | null // arrival day if different (overnight flights etc.)
   from_name: string
   to_name: string
   mode: TravelMode

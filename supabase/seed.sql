@@ -16,17 +16,17 @@ insert into stays (id, trip_id, location_name, start_date, end_date, color, map_
   ('b0000000-0000-4000-8000-000000000008', 'a0000000-0000-4000-8000-000000000001', 'Osaka',            '2026-12-11', '2026-12-15', '#F3E0CE', 'https://maps.google.com/?q=Osaka+Namba',            ''),
   ('b0000000-0000-4000-8000-000000000009', 'a0000000-0000-4000-8000-000000000001', 'Tokyo',            '2026-12-15', '2026-12-20', '#CBE4F6', 'https://maps.google.com/?q=Tokyo+Station',          '');
 
-insert into legs (trip_id, date, from_name, to_name, mode, notes) values
-  ('a0000000-0000-4000-8000-000000000001', '2026-11-12', 'Home',             'Hanoi',            'flight', 'Overnight flight, arrive on the 13th'),
-  ('a0000000-0000-4000-8000-000000000001', '2026-11-17', 'Hanoi',            'Ha Long Bay',      'bus',    '~2.5 h shuttle'),
-  ('a0000000-0000-4000-8000-000000000001', '2026-11-19', 'Ha Long Bay',      'Hoi An',           'flight', 'Via Da Nang'),
-  ('a0000000-0000-4000-8000-000000000001', '2026-11-24', 'Hoi An',           'Ho Chi Minh City', 'flight', ''),
-  ('a0000000-0000-4000-8000-000000000001', '2026-11-28', 'Ho Chi Minh City', 'Tokyo',            'flight', ''),
-  ('a0000000-0000-4000-8000-000000000001', '2026-12-04', 'Tokyo',            'Hakone',           'train',  'Romancecar from Shinjuku'),
-  ('a0000000-0000-4000-8000-000000000001', '2026-12-06', 'Hakone',           'Kyoto',            'train',  'Shinkansen from Odawara'),
-  ('a0000000-0000-4000-8000-000000000001', '2026-12-11', 'Kyoto',            'Osaka',            'train',  ''),
-  ('a0000000-0000-4000-8000-000000000001', '2026-12-15', 'Osaka',            'Tokyo',            'train',  'Shinkansen'),
-  ('a0000000-0000-4000-8000-000000000001', '2026-12-20', 'Tokyo',            'Home',             'flight', '');
+insert into legs (trip_id, date, arrive_date, from_name, to_name, mode, notes) values
+  ('a0000000-0000-4000-8000-000000000001', '2026-11-12', '2026-11-13', 'Home', 'Hanoi', 'flight', 'Overnight flight'),
+  ('a0000000-0000-4000-8000-000000000001', '2026-11-17', null, 'Hanoi',            'Ha Long Bay',      'bus',    '~2.5 h shuttle'),
+  ('a0000000-0000-4000-8000-000000000001', '2026-11-19', null, 'Ha Long Bay',      'Hoi An',           'flight', 'Via Da Nang'),
+  ('a0000000-0000-4000-8000-000000000001', '2026-11-24', null, 'Hoi An',           'Ho Chi Minh City', 'flight', ''),
+  ('a0000000-0000-4000-8000-000000000001', '2026-11-28', null, 'Ho Chi Minh City', 'Tokyo',            'flight', ''),
+  ('a0000000-0000-4000-8000-000000000001', '2026-12-04', null, 'Tokyo',            'Hakone',           'train',  'Romancecar from Shinjuku'),
+  ('a0000000-0000-4000-8000-000000000001', '2026-12-06', null, 'Hakone',           'Kyoto',            'train',  'Shinkansen from Odawara'),
+  ('a0000000-0000-4000-8000-000000000001', '2026-12-11', null, 'Kyoto',            'Osaka',            'train',  ''),
+  ('a0000000-0000-4000-8000-000000000001', '2026-12-15', null, 'Osaka',            'Tokyo',            'train',  'Shinkansen'),
+  ('a0000000-0000-4000-8000-000000000001', '2026-12-20', null, 'Tokyo',            'Home',             'flight', '');
 
 insert into places (trip_id, stay_id, name, category, map_url, notes) values
   ('a0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000001', 'Hoan Kiem Lake',          'sight',  'https://maps.google.com/?q=Hoan+Kiem+Lake', ''),

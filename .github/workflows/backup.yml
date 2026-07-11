@@ -1,0 +1,46 @@
+name: Backup itinerary
+
+# Exports all planner tables to JSON and commits them to backups/.
+# Every version is kept in git history, so any accidental deletion in the
+# app can be restored from here. Also acts as an extra Supabase keepalive.
+
+on:
+  schedule:
+    - cron: '47 5 * * 1' # Mondays 05:47 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export tables
+        env:
+          SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "VITE_SUPABASE_URL variable not set — skipping."
+            exit 0
+          fi
+          mkdir -p backups
+          for table in trips stays legs places; do
+            curl --fail --silent --show-error \
+              "$SUPABASE_URL/rest/v1/$table?select=*&order=id" \
+              -H "apikey: $SUPABASE_KEY" | jq '.' > "backups/$table.json"
+            echo "$table: $(jq 'length' "backups/$table.json") rows"
+          done
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add backups
+          if git diff --cached --quiet; then
+            echo "No changes since last backup."
+          else
+            git commit -m "Itinerary backup $(date -u +%F)"
+            git push
+          fi

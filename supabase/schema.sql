@@ -27,7 +27,8 @@ create table stays (
 create table legs (
   id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references trips (id) on delete cascade,
-  date date not null,
+  date date not null,          -- departure day
+  arrive_date date,            -- arrival day if different (overnight flights)
   from_name text not null,
   to_name text not null,
   mode text not null default 'flight',
