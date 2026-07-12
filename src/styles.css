@@ -263,6 +263,12 @@ textarea { resize: vertical; }
 
 .chip:hover { transform: translateY(-1px) scale(1.03); }
 
+.chip-count {
+  font-size: 0.72em;
+  opacity: 0.65;
+  margin-left: 4px;
+}
+
 .month { padding: 16px 18px 18px; }
 
 .month-title {
