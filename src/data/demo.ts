@@ -63,20 +63,21 @@ export function seedData(): DB {
 
   const mkPlace = (
     stayIdx: number | null, name: string, category: string,
-    map_url = '', notes = '',
+    map_url = '', notes = '', date: string | null = null,
   ): Place => ({
     id: uid(), trip_id: tripId,
     stay_id: stayIdx === null ? null : stays[stayIdx].id,
-    name, category, map_url, notes,
+    date, name, category, map_url, notes,
   })
 
   const places: Place[] = [
     mkPlace(0, 'Hoan Kiem Lake', 'sight', 'https://maps.google.com/?q=Hoan+Kiem+Lake'),
-    mkPlace(0, 'Bún chả Hương Liên', 'food', 'https://maps.google.com/?q=Bun+Cha+Huong+Lien+Hanoi', 'The Obama one'),
+    mkPlace(0, 'Bún chả Hương Liên', 'food', 'https://maps.google.com/?q=Bun+Cha+Huong+Lien+Hanoi', 'The Obama one', '2026-11-15'),
     mkPlace(2, 'An Bang Beach', 'nature', 'https://maps.google.com/?q=An+Bang+Beach'),
     mkPlace(4, 'teamLab Planets', 'sight', 'https://maps.google.com/?q=teamLab+Planets+Tokyo', 'Book ahead!'),
     mkPlace(6, 'Fushimi Inari', 'sight', 'https://maps.google.com/?q=Fushimi+Inari+Taisha', 'Go early morning'),
     mkPlace(null, 'Try a konbini egg sando', 'food', '', 'Any 7-Eleven 🥪'),
+    mkPlace(4, 'Tokyo restaurants', 'list', 'https://maps.app.goo.gl/your-saved-list', 'Google Maps saved list'),
   ]
 
   return { trips: [trip], stays, legs, places }

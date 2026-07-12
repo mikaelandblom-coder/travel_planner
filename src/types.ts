@@ -34,6 +34,7 @@ export type Place = {
   id: string
   trip_id: string
   stay_id: string | null // null = general idea, not tied to a stay
+  date: string | null // set = a visit planned for this specific day
   name: string
   category: string
   map_url: string
@@ -75,6 +76,7 @@ export const PLACE_CATEGORIES: { id: string; emoji: string; label: string }[] = 
   { id: 'sight', emoji: '⛩️', label: 'Sight' },
   { id: 'nature', emoji: '🌿', label: 'Nature' },
   { id: 'shopping', emoji: '🛍️', label: 'Shopping' },
+  { id: 'list', emoji: '📑', label: 'Saved list (e.g. Google Maps)' },
   { id: 'other', emoji: '✨', label: 'Other' },
 ]
 

@@ -11,7 +11,8 @@ type Props = {
   onSelectDate: (iso: string | null) => void
   onEditStay: (stay?: Stay, defaultDate?: string) => void
   onEditLeg: (leg?: Leg, defaultDate?: string) => void
-  onEditPlace: (place?: Place, defaultStayId?: string | null) => void
+  onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null) => void
+  onAssignStay: (stay: Stay, date: string) => void
   onDeleteStay: (s: Stay) => void
   onDeleteLeg: (l: Leg) => void
   onDeletePlace: (p: Place) => void
@@ -36,7 +37,12 @@ export function DayPanel(props: Props) {
 
 function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEditLeg, onEditPlace, onDeleteStay, onDeletePlace }: Props) {
   const stays = [...data.stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
-  const ideas = data.places.filter(p => !p.stay_id)
+  // The backup list: everything not yet allocated to a day. General ideas
+  // first, then grouped by stay in trip order.
+  const stayStart = (p: Place) => stays.find(s => s.id === p.stay_id)?.start_date ?? ''
+  const backup = data.places
+    .filter(p => !p.date)
+    .sort((a, b) => stayStart(a).localeCompare(stayStart(b)))
 
   return (
     <>
@@ -75,14 +81,22 @@ function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEditLeg, o
         {stays.length === 0 && <p className="hint">No stays yet{editMode ? ' — add your first one below!' : '.'}</p>}
       </div>
 
-      {(ideas.length > 0 || editMode) && <h3 className="panel-sub">💡 Ideas & other places</h3>}
-      <PlaceList places={ideas} editMode={editMode} onEditPlace={onEditPlace} onDeletePlace={onDeletePlace} />
+      {(backup.length > 0 || editMode) && (
+        <>
+          <h3 className="panel-sub">📌 Backup list</h3>
+          <p className="hint">
+            Restaurants & ideas without a day yet
+            {editMode ? ' — edit one to give it a day, or link a Google Maps saved list (📑).' : '.'}
+          </p>
+        </>
+      )}
+      <PlaceList places={backup} stays={stays} editMode={editMode} onEditPlace={onEditPlace} onDeletePlace={onDeletePlace} />
 
       {editMode && (
         <div className="btn-row">
           <button className="btn small" onClick={() => onEditStay(undefined, trip.start_date)}>＋ Stay</button>
           <button className="btn small" onClick={() => onEditLeg(undefined, trip.start_date)}>＋ Travel</button>
-          <button className="btn small" onClick={() => onEditPlace(undefined, null)}>＋ Idea</button>
+          <button className="btn small" onClick={() => onEditPlace(undefined, null)}>＋ Backup idea</button>
         </div>
       )}
     </>
@@ -95,6 +109,7 @@ function DayView(props: Props & { date: string }) {
     .filter(s => s.start_date <= date && date <= s.end_date)
     .sort((a, b) => a.start_date.localeCompare(b.start_date))
   const dayLegs = data.legs.filter(l => l.date === date || l.arrive_date === date)
+  const dayVisits = data.places.filter(p => p.date === date)
   const dayN = daysBetween(trip.start_date, date) + 1
   const total = daysBetween(trip.start_date, trip.end_date) + 1
 
@@ -128,7 +143,8 @@ function DayView(props: Props & { date: string }) {
       ))}
 
       {dayStays.map(s => {
-        const places = data.places.filter(p => p.stay_id === s.id)
+        // Visits planned for today are listed in their own section below.
+        const places = data.places.filter(p => p.stay_id === s.id && p.date !== date)
         return (
           <div key={s.id} className="sub-card" style={{ borderColor: s.color }}>
             <div className="stay-head">
@@ -158,42 +174,102 @@ function DayView(props: Props & { date: string }) {
         )
       })}
 
-      {dayStays.length === 0 && dayLegs.length === 0 && (
+      {dayVisits.length > 0 && (
+        <>
+          <h3 className="panel-sub">🍽️ Visits this day</h3>
+          <PlaceList places={dayVisits} editMode={editMode} onEditPlace={props.onEditPlace} onDeletePlace={props.onDeletePlace} />
+        </>
+      )}
+
+      {dayStays.length === 0 && dayLegs.length === 0 && dayVisits.length === 0 && (
         <p className="hint">Nothing planned this day yet {editMode ? '— add something below!' : '🌤️'}</p>
       )}
 
       {editMode && (
         <div className="btn-row">
-          <button className="btn small" onClick={() => props.onEditStay(undefined, date)}>＋ Stay here</button>
+          <StayPicker stays={data.stays} date={date} onAssign={props.onAssignStay} />
+          <button
+            className="btn small"
+            onClick={() => props.onEditPlace(undefined, dayStays[0]?.id ?? null, date)}
+          >＋ Visit this day</button>
           <button className="btn small" onClick={() => props.onEditLeg(undefined, date)}>＋ Travel this day</button>
         </div>
+      )}
+      {editMode && data.stays.length === 0 && (
+        <p className="hint">Days pick from the trip's stays — add your first stay from the ✨ Overview.</p>
       )}
     </>
   )
 }
 
-function PlaceList({ places, editMode, onEditPlace, onDeletePlace }: {
+/**
+ * Days can only use stays that already exist on the trip: picking one
+ * stretches that stay to cover this day, so the calendar bands and the
+ * per-day details always agree.
+ */
+function StayPicker({ stays, date, onAssign }: {
+  stays: Stay[]
+  date: string
+  onAssign: (stay: Stay, date: string) => void
+}) {
+  const candidates = stays
+    .filter(s => !(s.start_date <= date && date <= s.end_date))
+    .sort((a, b) => a.start_date.localeCompare(b.start_date))
+  if (candidates.length === 0) return null
+  return (
+    <select
+      className="stay-picker"
+      value=""
+      title="Assign one of the trip's stays to this day"
+      onChange={e => {
+        const s = candidates.find(x => x.id === e.target.value)
+        if (s) onAssign(s, date)
+      }}
+    >
+      <option value="" disabled>🏡 Stay here…</option>
+      {candidates.map(s => (
+        <option key={s.id} value={s.id}>
+          {s.location_name} ({fmtShort(s.start_date)} – {fmtShort(s.end_date)})
+        </option>
+      ))}
+    </select>
+  )
+}
+
+function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace }: {
   places: Place[]
+  stays?: Stay[] // when given, rows show which stay each place belongs to
   editMode: boolean
-  onEditPlace: (place?: Place, defaultStayId?: string | null) => void
+  onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null) => void
   onDeletePlace: (p: Place) => void
 }) {
   if (places.length === 0) return null
   return (
     <ul className="places">
-      {places.map(p => (
-        <li key={p.id}>
-          <span className="place-emoji">{categoryEmoji(p.category)}</span>
-          <span className="row-main">
-            <span className="row-title">{p.name}</span>
-            {p.notes && <span className="row-sub">{p.notes}</span>}
-          </span>
-          {p.map_url && (
-            <a className="icon-btn" href={p.map_url} target="_blank" rel="noreferrer" title="Open in Google Maps">📍</a>
-          )}
-          {editMode && <RowActions onEdit={() => onEditPlace(p)} onDelete={() => onDeletePlace(p)} />}
-        </li>
-      ))}
+      {places.map(p => {
+        const stay = stays?.find(s => s.id === p.stay_id)
+        return (
+          <li key={p.id}>
+            <span className="place-emoji">{categoryEmoji(p.category)}</span>
+            <span className="row-main">
+              <span className="row-title">{p.name}</span>
+              {(p.date || stay || p.notes) && (
+                <span className="row-sub sub-bits">
+                  {p.date && <span>📅 {fmtShort(p.date)}</span>}
+                  {stay && (
+                    <span><span className="tag-dot" style={{ background: stay.color }} />{stay.location_name}</span>
+                  )}
+                  {p.notes && <span>{p.notes}</span>}
+                </span>
+              )}
+            </span>
+            {p.map_url && (
+              <a className="icon-btn" href={p.map_url} target="_blank" rel="noreferrer" title="Open in Google Maps">📍</a>
+            )}
+            {editMode && <RowActions onEdit={() => onEditPlace(p)} onDelete={() => onDeletePlace(p)} />}
+          </li>
+        )
+      })}
     </ul>
   )
 }

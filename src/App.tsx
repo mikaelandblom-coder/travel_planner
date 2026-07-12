@@ -14,7 +14,7 @@ type ModalState =
   | { type: 'trip'; trip?: Trip }
   | { type: 'stay'; stay?: Stay; defaultDate?: string }
   | { type: 'leg'; leg?: Leg; defaultDate?: string }
-  | { type: 'place'; place?: Place; defaultStayId?: string | null }
+  | { type: 'place'; place?: Place; defaultStayId?: string | null; defaultDate?: string | null }
   | { type: 'login' }
 
 const errMsg = (e: unknown): string =>
@@ -137,6 +137,20 @@ export default function App() {
     void persist(() => store.deletePlace(p.id))
   }
 
+  /** Stretch an existing stay so it covers the given day (keeps days and stays in sync). */
+  function assignStayToDay(s: Stay, date: string) {
+    const gap = date < s.start_date ? daysBetween(date, s.start_date) : daysBetween(s.end_date, date)
+    if (gap > 1 && !confirm(
+      `${s.location_name} currently runs ${fmtShort(s.start_date)} – ${fmtShort(s.end_date)}.\nExtend it to cover ${fmtShort(date)}?`,
+    )) return
+    const extended: Stay = {
+      ...s,
+      start_date: date < s.start_date ? date : s.start_date,
+      end_date: date > s.end_date ? date : s.end_date,
+    }
+    void persist(() => store.saveStay(extended))
+  }
+
   function renderModal() {
     if (!modal) return null
     switch (modal.type) {
@@ -188,6 +202,7 @@ export default function App() {
               initial={modal.place}
               stays={data.stays}
               defaultStayId={modal.defaultStayId}
+              defaultDate={modal.defaultDate}
               onSave={v => {
                 const p: Place = { id: modal.place?.id ?? uid(), trip_id: trip!.id, ...v }
                 void persist(() => store.savePlace(p))
@@ -276,7 +291,8 @@ export default function App() {
             onSelectDate={setSelectedDate}
             onEditStay={(stay, defaultDate) => setModal({ type: 'stay', stay, defaultDate })}
             onEditLeg={(leg, defaultDate) => setModal({ type: 'leg', leg, defaultDate })}
-            onEditPlace={(place, defaultStayId) => setModal({ type: 'place', place, defaultStayId })}
+            onEditPlace={(place, defaultStayId, defaultDate) => setModal({ type: 'place', place, defaultStayId, defaultDate })}
+            onAssignStay={assignStayToDay}
             onDeleteStay={deleteStay}
             onDeleteLeg={deleteLeg}
             onDeletePlace={deletePlace}

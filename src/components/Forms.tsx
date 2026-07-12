@@ -206,16 +206,18 @@ export function LegForm({ initial, defaultDate, onSave, onDelete }: {
   )
 }
 
-export function PlaceForm({ initial, stays, defaultStayId, onSave, onDelete }: {
+export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, onDelete }: {
   initial?: Place
   stays: Stay[]
   defaultStayId?: string | null
+  defaultDate?: string | null
   onSave: (v: Omit<Place, 'id' | 'trip_id'>) => void
   onDelete?: () => void
 }) {
   const [name, setName] = useState(initial?.name ?? '')
   const [category, setCategory] = useState(initial?.category ?? 'sight')
   const [stayId, setStayId] = useState<string>(initial?.stay_id ?? defaultStayId ?? '')
+  const [date, setDate] = useState(initial?.date ?? defaultDate ?? '')
   const [mapUrl, setMapUrl] = useState(initial?.map_url ?? '')
   const [notes, setNotes] = useState(initial?.notes ?? '')
 
@@ -225,7 +227,7 @@ export function PlaceForm({ initial, stays, defaultStayId, onSave, onDelete }: {
     e.preventDefault()
     if (!name.trim()) return
     onSave({
-      name: name.trim(), category, stay_id: stayId || null,
+      name: name.trim(), category, stay_id: stayId || null, date: date || null,
       map_url: mapUrl.trim(), notes: notes.trim(),
     })
   }
@@ -248,14 +250,19 @@ export function PlaceForm({ initial, stays, defaultStayId, onSave, onDelete }: {
           ))}
         </div>
       </Field>
-      <Field label="Part of stay">
-        <select value={stayId} onChange={e => setStayId(e.target.value)}>
-          <option value="">💡 General idea (no stay)</option>
-          {sortedStays.map(s => (
-            <option key={s.id} value={s.id}>{s.location_name} ({fmtShort(s.start_date)})</option>
-          ))}
-        </select>
-      </Field>
+      <div className="field-row">
+        <Field label="Part of stay">
+          <select value={stayId} onChange={e => setStayId(e.target.value)}>
+            <option value="">💡 General idea (no stay)</option>
+            {sortedStays.map(s => (
+              <option key={s.id} value={s.id}>{s.location_name} ({fmtShort(s.start_date)})</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Day (optional)">
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        </Field>
+      </div>
       <Field label="Google Maps link">
         <input type="url" value={mapUrl} onChange={e => setMapUrl(e.target.value)} placeholder="https://maps.app.goo.gl/…" />
       </Field>

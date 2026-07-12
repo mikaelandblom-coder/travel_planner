@@ -184,6 +184,16 @@ body::before {
   cursor: pointer;
 }
 
+/* Sits alongside .btn.small in a .btn-row */
+.stay-picker {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  max-width: 100%;
+}
+
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--accent);
@@ -514,6 +524,29 @@ h3.row-title { font-size: 1rem; }
 }
 
 .place-emoji { flex: none; }
+
+/* Little "📅 date · stay · notes" bits under a place name */
+.sub-bits {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+}
+
+.sub-bits > span + span::before {
+  content: '·';
+  margin-right: 6px;
+  opacity: 0.6;
+}
+
+.tag-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: baseline;
+}
 
 .btn-row {
   display: flex;

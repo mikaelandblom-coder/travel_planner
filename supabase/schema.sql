@@ -40,6 +40,7 @@ create table places (
   id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references trips (id) on delete cascade,
   stay_id uuid references stays (id) on delete set null,
+  date date,                   -- set = a visit planned for this specific day
   name text not null,
   category text not null default 'other',
   map_url text not null default '',
