@@ -137,9 +137,28 @@ export default function App() {
     void persist(() => store.deletePlace(p.id))
   }
 
-  /** Stretch an existing stay so it covers the given day (keeps days and stays in sync). */
+  /**
+   * Assign a day to a stay (keeps days and stays in sync). Adjacent days
+   * stretch the stay; if the itinerary shows you leave in between (other
+   * stays or travel days), offer a separate return visit instead so the
+   * stay never bridges a period spent elsewhere.
+   */
   function assignStayToDay(s: Stay, date: string) {
-    const gap = date < s.start_date ? daysBetween(date, s.start_date) : daysBetween(s.end_date, date)
+    const [lo, hi] = date < s.start_date ? [date, s.start_date] : [s.end_date, date]
+    const gap = daysBetween(lo, hi)
+    const awayBetween =
+      data.stays.some(o => o.id !== s.id && o.start_date < hi && o.end_date > lo) ||
+      data.legs.some(l => lo <= l.date && l.date <= hi)
+
+    if (gap > 1 && awayBetween) {
+      if (!confirm(
+        `${s.location_name} is ${fmtShort(s.start_date)} – ${fmtShort(s.end_date)} and you have other plans in between.\nAdd a separate ${s.location_name} visit on ${fmtShort(date)}?`,
+      )) return
+      const revisit: Stay = { ...s, id: uid(), start_date: date, end_date: date }
+      void persist(() => store.saveStay(revisit))
+      return
+    }
+
     if (gap > 1 && !confirm(
       `${s.location_name} currently runs ${fmtShort(s.start_date)} – ${fmtShort(s.end_date)}.\nExtend it to cover ${fmtShort(date)}?`,
     )) return
