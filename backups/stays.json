@@ -1,8 +1,74 @@
 [
   {
+    "id": "3d5047cc-616a-49a1-a1f1-f0921270feb8",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "location_name": "Saigon",
+    "start_date": "2026-12-07",
+    "end_date": "2026-12-16",
+    "color": "#C9E8D2",
+    "map_url": "https://maps.app.goo.gl/ek4MJZ6h4Dxiabp5A",
+    "notes": "",
+    "created_at": "2026-07-11T19:48:08.704073+00:00"
+  },
+  {
+    "id": "94db101f-50cb-4736-982b-1c44ad807d8b",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "location_name": "Kyoto",
+    "start_date": "2026-11-22",
+    "end_date": "2026-11-24",
+    "color": "#CBE4F6",
+    "map_url": "https://maps.app.goo.gl/ScJ8DrtnshM1pKWp8",
+    "notes": "",
+    "created_at": "2026-07-12T08:20:27.111858+00:00"
+  },
+  {
+    "id": "c7989450-126e-41a9-9b12-9df45dce4113",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "location_name": "Tokyo",
+    "start_date": "2026-11-24",
+    "end_date": "2026-11-28",
+    "color": "#E6D9F7",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-07-12T08:21:27.748304+00:00"
+  },
+  {
+    "id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "location_name": "Osaka",
+    "start_date": "2026-11-18",
+    "end_date": "2026-11-22",
+    "color": "#FFD9C7",
+    "map_url": "https://maps.app.goo.gl/PuPnZzq4WZNBvS7J9",
+    "notes": "",
+    "created_at": "2026-07-12T08:18:56.469816+00:00"
+  },
+  {
+    "id": "da881b4c-fe36-4b87-8ff4-d7957b41e907",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "location_name": "Loc Ninh",
+    "start_date": "2026-11-30",
+    "end_date": "2026-12-07",
+    "color": "#FBEFC3",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-07-12T14:32:37.328352+00:00"
+  },
+  {
+    "id": "dda01009-1318-4a08-b7d7-d53131875f9f",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "location_name": "Saigon",
+    "start_date": "2026-11-28",
+    "end_date": "2026-11-30",
+    "color": "#C9E8D2",
+    "map_url": "https://maps.app.goo.gl/ek4MJZ6h4Dxiabp5A",
+    "notes": "",
+    "created_at": "2026-07-11T19:48:08.704073+00:00"
+  },
+  {
     "id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "location_name": "Landmark 2",
+    "location_name": "Saigon",
     "start_date": "2026-11-15",
     "end_date": "2026-11-17",
     "color": "#C9E8D2",

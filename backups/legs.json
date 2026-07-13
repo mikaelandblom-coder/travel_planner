@@ -6,7 +6,96 @@
     "from_name": "Stockholm",
     "to_name": "Saigon",
     "mode": "flight",
-    "notes": "Flyget går 06:10",
-    "created_at": "2026-07-11T19:48:48.606471+00:00"
+    "notes": "Flyget går 06:10, vi landar 06:35",
+    "created_at": "2026-07-11T19:48:48.606471+00:00",
+    "arrive_date": "2026-11-15"
+  },
+  {
+    "id": "1a08eeb2-5e75-49b4-8859-0dbbdbba9f11",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-12-09",
+    "from_name": "Saigon",
+    "to_name": "Stockholm",
+    "mode": "flight",
+    "notes": "Micke åker hem. Flyget går 00:20 den 10e så vi behöver åka till flygplatsen den 9e",
+    "created_at": "2026-07-12T14:35:07.690643+00:00",
+    "arrive_date": null
+  },
+  {
+    "id": "3601c659-31c5-460f-88ca-b0b5f2e23c52",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-11-30",
+    "from_name": "Saigon",
+    "to_name": "Loc Ninh",
+    "mode": "car",
+    "notes": "",
+    "created_at": "2026-07-12T14:33:03.029867+00:00",
+    "arrive_date": null
+  },
+  {
+    "id": "3e748f8c-fc42-4424-b2db-c03353baf32c",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-11-17",
+    "from_name": "Saigon",
+    "to_name": "Osaka",
+    "mode": "flight",
+    "notes": "Flyget går 00:05 den 18e men vi behöver vara på flygplatsen den 17e",
+    "created_at": "2026-07-12T08:18:04.742133+00:00",
+    "arrive_date": "2026-11-18"
+  },
+  {
+    "id": "78edf5bb-a67e-4f02-b6eb-6412079bdd70",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-11-24",
+    "from_name": "Kyoto",
+    "to_name": "Tokyo",
+    "mode": "train",
+    "notes": "",
+    "created_at": "2026-07-12T08:21:49.603524+00:00",
+    "arrive_date": null
+  },
+  {
+    "id": "8d7d36b6-324b-46be-98fd-868b8ca335db",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-11-22",
+    "from_name": "Osaka",
+    "to_name": "Kyoto",
+    "mode": "train",
+    "notes": "",
+    "created_at": "2026-07-12T08:19:52.100576+00:00",
+    "arrive_date": null
+  },
+  {
+    "id": "8ffa02de-7eee-4dca-9c64-bec91150caff",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-12-07",
+    "from_name": "Loc Ninh",
+    "to_name": "Saigon",
+    "mode": "car",
+    "notes": "",
+    "created_at": "2026-07-12T14:33:29.60864+00:00",
+    "arrive_date": null
+  },
+  {
+    "id": "aae68671-5040-4ee1-a6ba-2fcd3d3a5f60",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-11-28",
+    "from_name": "Tokyo",
+    "to_name": "Saigon",
+    "mode": "flight",
+    "notes": "",
+    "created_at": "2026-07-12T08:22:48.107414+00:00",
+    "arrive_date": null
+  },
+  {
+    "id": "f9ebd825-c35d-440e-8e25-408101e731f1",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-12-16",
+    "from_name": "Saigon",
+    "to_name": "Stoccholm",
+    "mode": "flight",
+    "notes": "Mai åker hem, flyget går 23:50",
+    "created_at": "2026-07-12T14:35:33.823659+00:00",
+    "arrive_date": null
   }
 ]
