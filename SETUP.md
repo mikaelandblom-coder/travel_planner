@@ -22,9 +22,11 @@ Follow the three parts below once and you're done.
    paste the whole contents of [`supabase/schema.sql`](supabase/schema.sql), and click **Run**.
    ⚠️ Before running, edit the last lines: replace `mai@example.com` with Mai's
    real email. These two emails are the only ones allowed to edit.
-4. **Check auth settings**: under **Authentication → Sign In / Up**, make sure the
-   **Email** provider is enabled (it is by default). Magic links are used, so no
-   passwords are needed.
+4. **Create the two accounts**: under **Authentication → Users → Add user →
+   Create new user**, add each editor's email with a password of your choice and
+   tick **Auto Confirm User** (so no confirmation email is needed). The emails
+   must match the ones in the `editors` table.
+   Forgot a password later? Same place — open the user and set a new one.
 5. **Collect your keys**: under **Project Settings → Data API** copy:
    - **Project URL** (looks like `https://abcdefgh.supabase.co`)
    - **anon / public key**
@@ -50,21 +52,13 @@ or delete the row to revoke access. Emails must match what the person signs in w
 4. Push to `main` (or run the **Deploy to GitHub Pages** workflow manually).
    Your planner appears at `https://<username>.github.io/<repo>/`.
 
-### Tell Supabase about your site URL
-
-Back in Supabase: **Authentication → URL Configuration**:
-
-- **Site URL**: `https://<username>.github.io/<repo>/`
-- **Redirect URLs**: add the same URL, and `http://localhost:5173` for local dev.
-
-This is where the magic-link email sends you after clicking.
-
 ---
 
 ## Part 3 — Signing in & editing
 
 1. Open the published site, tap **🖊️ Edit**.
-2. Enter your email → you get a magic link → open it **on the same device** → you're in.
+2. Enter your email and password (set up in Part 1, step 4) → you're in.
+   No emails involved, so it works the same on any device or browser.
 3. Sessions last a long time, so you'll rarely need to sign in again on the same device.
 
 Anyone else visiting the page just sees the pretty read-only planner. If someone
@@ -80,8 +74,6 @@ the database refuses every write.
   *that* after 60 days without repo activity, but emails you first — one click
   re-enables it. If the project ever does pause, restoring it from the Supabase
   dashboard takes a minute and loses nothing.
-- **Magic-link emails**: Supabase's built-in email sender is rate-limited to a
-  handful of emails per hour — fine for two people who rarely log in.
 - **Offline**: the app caches the last-loaded itinerary, so view mode works on
   the train / plane. Editing needs a connection.
 

@@ -276,40 +276,33 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
 
   async function submit(e: FormEvent) {
     e.preventDefault()
     if (!supabase) return
     setBusy(true)
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
-      options: { emailRedirectTo: window.location.origin + window.location.pathname },
+      password,
     })
     setBusy(false)
     if (error) alert(error.message)
-    else setSent(true)
-  }
-
-  if (sent) {
-    return (
-      <p className="hint">
-        💌 Check your inbox! We sent a sign-in link to <strong>{email}</strong>.
-        Open it on this device and you'll be signed in.
-      </p>
-    )
   }
 
   return (
     <form onSubmit={submit}>
-      <p className="hint">Enter your email and we'll send a magic sign-in link — no password needed.</p>
+      <p className="hint">Sign in with your planner account — same on every device.</p>
       <Field label="Email">
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" />
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" autoComplete="email" />
+      </Field>
+      <Field label="Password">
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
       </Field>
       <div className="btn-row form-buttons">
         <button className="btn primary" type="submit" disabled={busy}>
-          {busy ? 'Sending…' : '💌 Send magic link'}
+          {busy ? 'Signing in…' : '🔑 Sign in'}
         </button>
       </div>
     </form>

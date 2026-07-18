@@ -7,7 +7,7 @@ A cute, minimal travel planner for two — first stop: **Vietnam & Japan, Nov–
 - **Day details**: tap a day to see the stay, notes, travel legs and saved
   places with Google Maps links.
 - **View & edit modes**: anyone with the link can look, only we can edit
-  (Supabase magic-link login + row-level security).
+  (Supabase password login + row-level security).
 - **Multi-trip**: built for future adventures too.
 - Hosted free on **GitHub Pages**, data in **Supabase**, offline read cache
   for when we're actually travelling.
