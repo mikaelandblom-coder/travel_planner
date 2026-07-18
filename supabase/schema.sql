@@ -41,8 +41,12 @@ create table places (
   trip_id uuid not null references trips (id) on delete cascade,
   stay_id uuid references stays (id) on delete set null,
   date date,                   -- set = a visit planned for this specific day
+  start_time time,             -- optional 'when does it start'
+  end_time time,               -- optional 'when does it end'
   name text not null,
   category text not null default 'other',
+  emoji text not null default '',  -- custom emoji; '' = use the category's
+
   map_url text not null default '',
   notes text not null default '',
   created_at timestamptz not null default now()

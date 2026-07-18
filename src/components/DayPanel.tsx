@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { Leg, Place, Stay, Trip, TripData } from '../types'
-import { categoryEmoji, modeEmoji } from '../types'
+import { modeEmoji, placeEmoji, timeKey, timeRange } from '../types'
 import { daysBetween, fmtLong, fmtShort } from '../lib/dates'
 
 type Props = {
@@ -109,7 +109,9 @@ function DayView(props: Props & { date: string }) {
     .filter(s => s.start_date <= date && date <= s.end_date)
     .sort((a, b) => a.start_date.localeCompare(b.start_date))
   const dayLegs = data.legs.filter(l => l.date === date || l.arrive_date === date)
-  const dayVisits = data.places.filter(p => p.date === date)
+  const dayVisits = data.places
+    .filter(p => p.date === date)
+    .sort((a, b) => timeKey(a).localeCompare(timeKey(b)))
   const dayN = daysBetween(trip.start_date, date) + 1
   const total = daysBetween(trip.start_date, trip.end_date) + 1
 
@@ -142,41 +144,32 @@ function DayView(props: Props & { date: string }) {
         </div>
       ))}
 
-      {dayStays.map(s => {
-        // Visits planned for today are listed in their own section below.
-        const places = data.places.filter(p => p.stay_id === s.id && p.date !== date)
-        return (
-          <div key={s.id} className="sub-card" style={{ borderColor: s.color }}>
-            <div className="stay-head">
-              <span className="dot" style={{ background: s.color }} />
-              <div className="row-main">
-                <h3 className="row-title">{s.location_name}</h3>
-                <p className="row-sub">
-                  {fmtShort(s.start_date)} – {fmtShort(s.end_date)} · {daysBetween(s.start_date, s.end_date)} nights
-                </p>
-              </div>
-              {editMode && <RowActions onEdit={() => props.onEditStay(s)} onDelete={() => props.onDeleteStay(s)} />}
+      {dayStays.map(s => (
+        // Just the stay itself — the full list of its places lives in the
+        // ✨ Overview; this view only shows what's planned for the day.
+        <div key={s.id} className="sub-card" style={{ borderColor: s.color }}>
+          <div className="stay-head">
+            <span className="dot" style={{ background: s.color }} />
+            <div className="row-main">
+              <h3 className="row-title">{s.location_name}</h3>
+              <p className="row-sub">
+                {fmtShort(s.start_date)} – {fmtShort(s.end_date)} · {daysBetween(s.start_date, s.end_date)} nights
+              </p>
             </div>
-            {s.notes && <p className="notes">{s.notes}</p>}
-            {s.map_url && (
-              <a className="btn small link" href={s.map_url} target="_blank" rel="noreferrer">
-                📍 Open in Google Maps
-              </a>
-            )}
-            {places.length > 0 && <h4 className="panel-sub">Places</h4>}
-            <PlaceList places={places} editMode={editMode} onEditPlace={props.onEditPlace} onDeletePlace={props.onDeletePlace} />
-            {editMode && (
-              <div className="btn-row">
-                <button className="btn small" onClick={() => props.onEditPlace(undefined, s.id)}>＋ Place</button>
-              </div>
-            )}
+            {editMode && <RowActions onEdit={() => props.onEditStay(s)} onDelete={() => props.onDeleteStay(s)} />}
           </div>
-        )
-      })}
+          {s.notes && <p className="notes">{s.notes}</p>}
+          {s.map_url && (
+            <a className="btn small link" href={s.map_url} target="_blank" rel="noreferrer">
+              📍 Open in Google Maps
+            </a>
+          )}
+        </div>
+      ))}
 
       {dayVisits.length > 0 && (
         <>
-          <h3 className="panel-sub">🍽️ Visits this day</h3>
+          <h3 className="panel-sub">🍽️ Plans this day</h3>
           <PlaceList places={dayVisits} editMode={editMode} onEditPlace={props.onEditPlace} onDeletePlace={props.onDeletePlace} />
         </>
       )}
@@ -250,12 +243,13 @@ function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace }: {
         const stay = stays?.find(s => s.id === p.stay_id)
         return (
           <li key={p.id}>
-            <span className="place-emoji">{categoryEmoji(p.category)}</span>
+            <span className="place-emoji">{placeEmoji(p)}</span>
             <span className="row-main">
               <span className="row-title">{p.name}</span>
-              {(p.date || stay || p.notes) && (
+              {(p.date || timeRange(p) || stay || p.notes) && (
                 <span className="row-sub sub-bits">
                   {p.date && <span>📅 {fmtShort(p.date)}</span>}
+                  {timeRange(p) && <span>🕐 {timeRange(p)}</span>}
                   {stay && (
                     <span><span className="tag-dot" style={{ background: stay.color }} />{stay.location_name}</span>
                   )}

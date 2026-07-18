@@ -216,8 +216,12 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
 }) {
   const [name, setName] = useState(initial?.name ?? '')
   const [category, setCategory] = useState(initial?.category ?? 'sight')
+  const [emoji, setEmoji] = useState(initial?.emoji ?? '')
   const [stayId, setStayId] = useState<string>(initial?.stay_id ?? defaultStayId ?? '')
   const [date, setDate] = useState(initial?.date ?? defaultDate ?? '')
+  // DB time columns come back as 'HH:MM:SS' — the time input wants 'HH:MM'.
+  const [startTime, setStartTime] = useState(initial?.start_time?.slice(0, 5) ?? '')
+  const [endTime, setEndTime] = useState(initial?.end_time?.slice(0, 5) ?? '')
   const [mapUrl, setMapUrl] = useState(initial?.map_url ?? '')
   const [notes, setNotes] = useState(initial?.notes ?? '')
 
@@ -227,7 +231,9 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
     e.preventDefault()
     if (!name.trim()) return
     onSave({
-      name: name.trim(), category, stay_id: stayId || null, date: date || null,
+      name: name.trim(), category, emoji: emoji.trim(),
+      stay_id: stayId || null, date: date || null,
+      start_time: startTime || null, end_time: endTime || null,
       map_url: mapUrl.trim(), notes: notes.trim(),
     })
   }
@@ -237,19 +243,31 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
       <Field label="Name">
         <input value={name} onChange={e => setName(e.target.value)} required placeholder="Fushimi Inari" />
       </Field>
-      <Field label="Type">
-        <div className="swatches">
-          {PLACE_CATEGORIES.map(c => (
-            <button
-              type="button"
-              key={c.id}
-              className={'swatch mode' + (c.id === category ? ' active' : '')}
-              onClick={() => setCategory(c.id)}
-              title={c.label}
-            >{c.emoji}</button>
-          ))}
-        </div>
-      </Field>
+      <div className="field-row">
+        <Field label="Type">
+          <div className="swatches">
+            {PLACE_CATEGORIES.map(c => (
+              <button
+                type="button"
+                key={c.id}
+                className={'swatch mode' + (c.id === category && !emoji.trim() ? ' active' : '')}
+                onClick={() => { setCategory(c.id); setEmoji('') }}
+                title={c.label}
+              >{c.emoji}</button>
+            ))}
+          </div>
+        </Field>
+        <Field label="Own emoji">
+          <input
+            className="emoji-input"
+            value={emoji}
+            onChange={e => setEmoji(e.target.value)}
+            maxLength={4}
+            placeholder="🎡"
+            title="Paste any emoji (Win + .) to use instead of a type above"
+          />
+        </Field>
+      </div>
       <div className="field-row">
         <Field label="Part of stay">
           <select value={stayId} onChange={e => setStayId(e.target.value)}>
@@ -261,6 +279,14 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
         </Field>
         <Field label="Day (optional)">
           <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        </Field>
+      </div>
+      <div className="field-row">
+        <Field label="Starts (optional)">
+          <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
+        </Field>
+        <Field label="Ends (optional)">
+          <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
         </Field>
       </div>
       <Field label="Google Maps link">

@@ -299,6 +299,7 @@ export default function App() {
             trip={trip}
             stays={data.stays}
             legs={data.legs}
+            places={data.places}
             selectedDate={selectedDate}
             onSelect={iso => setSelectedDate(cur => (cur === iso ? null : iso))}
           />

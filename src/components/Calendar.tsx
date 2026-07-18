@@ -1,17 +1,18 @@
 import type { CSSProperties } from 'react'
-import type { Leg, Stay, Trip } from '../types'
-import { modeEmoji } from '../types'
+import type { Leg, Place, Stay, Trip } from '../types'
+import { modeEmoji, placeEmoji, timeKey } from '../types'
 import { mondayIndex, monthLabel, monthsInRange, todayISO, WEEKDAYS } from '../lib/dates'
 
 type Props = {
   trip: Trip
   stays: Stay[]
   legs: Leg[]
+  places: Place[]
   selectedDate: string | null
   onSelect: (iso: string) => void
 }
 
-export function Calendar({ trip, stays, legs, selectedDate, onSelect }: Props) {
+export function Calendar({ trip, stays, legs, places, selectedDate, onSelect }: Props) {
   const sorted = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
 
   // One legend chip per location, even when it has several visits.
@@ -61,6 +62,7 @@ export function Calendar({ trip, stays, legs, selectedDate, onSelect }: Props) {
           trip={trip}
           stays={sorted}
           legs={legs}
+          places={places}
           selectedDate={selectedDate}
           today={today}
           onSelect={onSelect}
@@ -84,12 +86,16 @@ type MonthProps = {
   trip: Trip
   stays: Stay[]
   legs: Leg[]
+  places: Place[]
   selectedDate: string | null
   today: string
   onSelect: (iso: string) => void
 }
 
-function MonthGrid({ year, month, trip, stays, legs, selectedDate, today, onSelect }: MonthProps) {
+/** At most this many activity lines fit in a cell; the rest collapse to "+n". */
+const MAX_CELL_ACTIVITIES = 3
+
+function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today, onSelect }: MonthProps) {
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const offset = mondayIndex(new Date(year, month, 1))
   const pad2 = (n: number) => String(n).padStart(2, '0')
@@ -101,6 +107,9 @@ function MonthGrid({ year, month, trip, stays, legs, selectedDate, today, onSele
     const iso = `${year}-${pad2(month + 1)}-${pad2(d)}`
     const dayStays = stays.filter(s => s.start_date <= iso && iso <= s.end_date)
     const dayLegs = legs.filter(l => l.date === iso || l.arrive_date === iso)
+    const dayPlaces = places
+      .filter(p => p.date === iso)
+      .sort((a, b) => timeKey(a).localeCompare(timeKey(b)))
     const inTrip = trip.start_date <= iso && iso <= trip.end_date
     const arriving = dayStays.find(s => s.start_date === iso)
 
@@ -125,7 +134,24 @@ function MonthGrid({ year, month, trip, stays, legs, selectedDate, today, onSele
         title={dayStays.map(s => s.location_name).join(' → ') || undefined}
       >
         <span className="daynum">{d}</span>
-        {dayLegs.length > 0 && <span className="leg-badge">{legBadge(dayLegs[0], iso)}</span>}
+        {(dayLegs.length > 0 || dayPlaces.length > 0) && (
+          <span className="day-acts">
+            {dayLegs.map(l => (
+              <span key={l.id} className="day-act leg">
+                {legBadge(l, iso)} {l.from_name} → {l.to_name}
+              </span>
+            ))}
+            {dayPlaces.slice(0, MAX_CELL_ACTIVITIES).map(p => (
+              <span key={p.id} className="day-act">
+                {p.start_time && <span className="day-act-time">{p.start_time.slice(0, 5)}</span>}
+                {placeEmoji(p)} {p.name}
+              </span>
+            ))}
+            {dayPlaces.length > MAX_CELL_ACTIVITIES && (
+              <span className="day-act more">+{dayPlaces.length - MAX_CELL_ACTIVITIES} more</span>
+            )}
+          </span>
+        )}
         {arriving && <span className="day-label">{arriving.location_name}</span>}
       </button>,
     )

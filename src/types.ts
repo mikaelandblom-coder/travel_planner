@@ -35,8 +35,11 @@ export type Place = {
   trip_id: string
   stay_id: string | null // null = general idea, not tied to a stay
   date: string | null // set = a visit planned for this specific day
+  start_time: string | null // 'HH:MM', optional
+  end_time: string | null // 'HH:MM', optional
   name: string
   category: string
+  emoji: string // custom emoji; '' = use the category's emoji
   map_url: string
   notes: string
 }
@@ -82,3 +85,20 @@ export const PLACE_CATEGORIES: { id: string; emoji: string; label: string }[] = 
 
 export const categoryEmoji = (c: string) =>
   PLACE_CATEGORIES.find(x => x.id === c)?.emoji ?? '✨'
+
+export const placeEmoji = (p: Pick<Place, 'emoji' | 'category'>) =>
+  p.emoji || categoryEmoji(p.category)
+
+/** '13:00' / '13:00–16:00' / '–16:00'; '' when no times. Trims DB seconds. */
+export function timeRange(p: Pick<Place, 'start_time' | 'end_time'>): string {
+  const t = (s: string | null | undefined) => (s ? s.slice(0, 5) : '')
+  const a = t(p.start_time)
+  const b = t(p.end_time)
+  if (a && b) return `${a}–${b}`
+  if (a) return a
+  if (b) return `–${b}`
+  return ''
+}
+
+/** Sort key: timed visits first (by start), untimed last. */
+export const timeKey = (p: Pick<Place, 'start_time'>) => p.start_time ?? '~'
