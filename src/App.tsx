@@ -7,7 +7,7 @@ import {
 } from './types'
 import { daysBetween, fmtShort } from './lib/dates'
 import { Calendar } from './components/Calendar'
-import { DayPanel } from './components/DayPanel'
+import { DayModal, Overview } from './components/DayPanel'
 import { LegForm, LoginForm, Modal, PlaceForm, StayForm, TripForm } from './components/Forms'
 
 type ModalState =
@@ -301,12 +301,11 @@ export default function App() {
             legs={data.legs}
             places={data.places}
             selectedDate={selectedDate}
-            onSelect={iso => setSelectedDate(cur => (cur === iso ? null : iso))}
+            onSelect={setSelectedDate}
           />
-          <DayPanel
+          <Overview
             trip={trip}
             data={data}
-            selectedDate={selectedDate}
             editMode={editMode}
             onSelectDate={setSelectedDate}
             onEditStay={(stay, defaultDate) => setModal({ type: 'stay', stay, defaultDate })}
@@ -334,6 +333,22 @@ export default function App() {
 
       <footer className="footer">made with 💛 for our adventures</footer>
 
+      {trip && selectedDate && !modal && (
+        <DayModal
+          trip={trip}
+          data={data}
+          date={selectedDate}
+          editMode={editMode}
+          onSelectDate={setSelectedDate}
+          onEditStay={(stay, defaultDate) => setModal({ type: 'stay', stay, defaultDate })}
+          onEditLeg={(leg, defaultDate) => setModal({ type: 'leg', leg, defaultDate })}
+          onEditPlace={(place, defaultStayId, defaultDate) => setModal({ type: 'place', place, defaultStayId, defaultDate })}
+          onAssignStay={assignStayToDay}
+          onDeleteStay={deleteStay}
+          onDeleteLeg={deleteLeg}
+          onDeletePlace={deletePlace}
+        />
+      )}
       {renderModal()}
     </div>
   )

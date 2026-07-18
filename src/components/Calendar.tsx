@@ -92,13 +92,13 @@ type MonthProps = {
   onSelect: (iso: string) => void
 }
 
-/** At most this many activity lines fit in a cell; the rest collapse to "+n". */
-const MAX_CELL_ACTIVITIES = 3
-
 function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today, onSelect }: MonthProps) {
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const offset = mondayIndex(new Date(year, month, 1))
   const pad2 = (n: number) => String(n).padStart(2, '0')
+
+  // Longest activity line per weekday column, so busy columns can get wider.
+  const colLen = [0, 0, 0, 0, 0, 0, 0]
 
   const cells = []
   for (let i = 0; i < offset; i++) cells.push(<div key={'pad' + i} className="day pad" />)
@@ -112,6 +112,14 @@ function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today
       .sort((a, b) => timeKey(a).localeCompare(timeKey(b)))
     const inTrip = trip.start_date <= iso && iso <= trip.end_date
     const arriving = dayStays.find(s => s.start_date === iso)
+
+    const col = (offset + d - 1) % 7
+    const lines = [
+      ...dayLegs.map(l => `${legBadge(l, iso)} ${l.from_name} → ${l.to_name}`),
+      ...dayPlaces.map(p => `${p.start_time ? p.start_time.slice(0, 5) + ' ' : ''}${placeEmoji(p)} ${p.name}`),
+      ...(arriving ? [arriving.location_name] : []),
+    ]
+    for (const t of lines) colLen[col] = Math.max(colLen[col], t.length)
 
     let style: CSSProperties | undefined
     if (dayStays.length === 1) {
@@ -141,15 +149,12 @@ function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today
                 {legBadge(l, iso)} {l.from_name} → {l.to_name}
               </span>
             ))}
-            {dayPlaces.slice(0, MAX_CELL_ACTIVITIES).map(p => (
+            {dayPlaces.map(p => (
               <span key={p.id} className="day-act">
                 {p.start_time && <span className="day-act-time">{p.start_time.slice(0, 5)}</span>}
                 {placeEmoji(p)} {p.name}
               </span>
             ))}
-            {dayPlaces.length > MAX_CELL_ACTIVITIES && (
-              <span className="day-act more">+{dayPlaces.length - MAX_CELL_ACTIVITIES} more</span>
-            )}
           </span>
         )}
         {arriving && <span className="day-label">{arriving.location_name}</span>}
@@ -157,15 +162,21 @@ function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today
     )
   }
 
+  // Unequal columns: a column's width grows with its longest line (capped so
+  // quiet days keep a usable minimum). ≤14 chars stays at 1fr.
+  const template = colLen
+    .map(len => `minmax(0, ${Math.min(2.4, Math.max(1, len / 14)).toFixed(2)}fr)`)
+    .join(' ')
+
   return (
     <div className="month card">
       <h2 className="month-title">{monthLabel(year, month)}</h2>
-      <div className="grid weekdays">
+      <div className="grid weekdays" style={{ gridTemplateColumns: template }}>
         {WEEKDAYS.map(w => (
           <div key={w} className={'wd' + (w === 'Sat' || w === 'Sun' ? ' wknd' : '')}>{w}</div>
         ))}
       </div>
-      <div className="grid days">{cells}</div>
+      <div className="grid days" style={{ gridTemplateColumns: template }}>{cells}</div>
     </div>
   )
 }

@@ -1,12 +1,10 @@
-import { useEffect, useRef } from 'react'
 import type { Leg, Place, Stay, Trip, TripData } from '../types'
 import { modeEmoji, placeEmoji, timeKey, timeRange } from '../types'
-import { daysBetween, fmtLong, fmtShort } from '../lib/dates'
+import { addDays, daysBetween, fmtLong, fmtShort } from '../lib/dates'
 
 type Props = {
   trip: Trip
   data: TripData
-  selectedDate: string | null
   editMode: boolean
   onSelectDate: (iso: string | null) => void
   onEditStay: (stay?: Stay, defaultDate?: string) => void
@@ -18,24 +16,8 @@ type Props = {
   onDeletePlace: (p: Place) => void
 }
 
-export function DayPanel(props: Props) {
-  const ref = useRef<HTMLElement>(null)
-
-  // On narrow screens the panel sits below the calendar — bring it into view.
-  useEffect(() => {
-    if (props.selectedDate && window.innerWidth < 900) {
-      ref.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }
-  }, [props.selectedDate])
-
-  return (
-    <aside className="panel card" ref={ref}>
-      {props.selectedDate ? <DayView {...props} date={props.selectedDate} /> : <Overview {...props} />}
-    </aside>
-  )
-}
-
-function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEditLeg, onEditPlace, onDeleteStay, onDeletePlace }: Props) {
+/** Trip summary + backup list, shown below the calendar. */
+export function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEditLeg, onEditPlace, onDeleteStay, onDeletePlace }: Props) {
   const stays = [...data.stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
   // The backup list: everything not yet allocated to a day. General ideas
   // first, then grouped by stay in trip order.
@@ -45,7 +27,7 @@ function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEditLeg, o
     .sort((a, b) => stayStart(a).localeCompare(stayStart(b)))
 
   return (
-    <>
+    <aside className="panel card">
       <h2 className="panel-title">✨ Overview</h2>
       <p className="hint">
         {editMode
@@ -99,7 +81,18 @@ function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEditLeg, o
           <button className="btn small" onClick={() => onEditPlace(undefined, null)}>＋ Backup idea</button>
         </div>
       )}
-    </>
+    </aside>
+  )
+}
+
+/** A day's details in a popup over the calendar. */
+export function DayModal(props: Props & { date: string }) {
+  return (
+    <div className="overlay" onMouseDown={() => props.onSelectDate(null)}>
+      <div className="modal day-modal card" onMouseDown={e => e.stopPropagation()}>
+        <DayView {...props} />
+      </div>
+    </div>
   )
 }
 
@@ -122,7 +115,11 @@ function DayView(props: Props & { date: string }) {
           <h2 className="panel-title">{fmtLong(date)}</h2>
           {dayN >= 1 && dayN <= total && <p className="hint">Day {dayN} of {total}</p>}
         </div>
-        <button className="icon-btn" title="Back to overview" onClick={() => props.onSelectDate(null)}>✕</button>
+        <span className="day-nav">
+          <button className="icon-btn" title="Previous day" onClick={() => props.onSelectDate(addDays(date, -1))}>‹</button>
+          <button className="icon-btn" title="Next day" onClick={() => props.onSelectDate(addDays(date, 1))}>›</button>
+          <button className="icon-btn" title="Close" onClick={() => props.onSelectDate(null)}>✕</button>
+        </span>
       </div>
 
       {dayLegs.map(l => (
