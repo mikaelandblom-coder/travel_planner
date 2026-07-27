@@ -252,6 +252,20 @@
     "emoji": "🍣"
   },
   {
+    "id": "e4a7a3f8-1dc1-43d4-a0db-72190bf9c0d0",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": null,
+    "name": "Handla saker i Vietnam",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Gui Cuon saker: doppa vatten och lyft upp på talrik",
+    "created_at": "2026-07-24T14:07:53.326161+00:00",
+    "date": null,
+    "start_time": null,
+    "end_time": null,
+    "emoji": "🛒"
+  },
+  {
     "id": "f38323e6-8dcb-49a1-b4d4-c2f2f09b49f3",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
