@@ -228,6 +228,115 @@ textarea { resize: vertical; }
   gap: 16px;
 }
 
+/* ---------- trip picker (start page) ---------- */
+
+.trip-picker-hint {
+  margin: 2px 4px 12px;
+  text-align: center;
+}
+
+.trips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.trip-card {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.trip-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: var(--line);
+}
+
+.trip-card.tone-soon::before { background: #cbe4f6; }
+.trip-card.tone-now::before { background: var(--accent); }
+.trip-card.tone-past::before { background: #e7ded3; }
+
+.trip-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(90, 70, 50, 0.14);
+}
+
+.trip-card.tone-past { opacity: 0.75; }
+
+.trip-card-open {
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  padding: 16px 16px 16px 20px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.trip-card-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex: none;
+  filter: drop-shadow(0 2px 3px rgba(90, 70, 50, 0.15));
+}
+
+.trip-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.trip-card-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.trip-card-status {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.tone-now .trip-card-status { color: var(--accent); }
+
+.trip-card-edit {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.trip-card-new {
+  font-family: var(--font);
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  border: 2px dashed var(--line);
+  box-shadow: none;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+  min-height: 92px;
+}
+
+.trip-card-new::before { display: none; }
+
+.trip-card-new:hover { color: var(--ink); border-color: var(--accent); }
+
 /* ---------- calendar ---------- */
 
 .calendar {

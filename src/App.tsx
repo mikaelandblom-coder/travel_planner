@@ -9,6 +9,7 @@ import { daysBetween, fmtShort } from './lib/dates'
 import { Calendar } from './components/Calendar'
 import { DayModal, Overview } from './components/DayPanel'
 import { LegForm, LoginForm, Modal, PlaceForm, StayForm, TripForm } from './components/Forms'
+import { TripList } from './components/TripList'
 
 type ModalState =
   | { type: 'trip'; trip?: Trip }
@@ -46,7 +47,8 @@ export default function App() {
       setTrips(list)
       setOffline(store.offline)
       setLoadError(null)
-      setTripId(prev => (prev && list.some(t => t.id === prev)) ? prev : (list[0]?.id ?? null))
+      // No auto-open: the start page is the trip picker.
+      setTripId(prev => (prev && list.some(t => t.id === prev)) ? prev : null)
     } catch (e) {
       setTrips([])
       setLoadError(errMsg(e))
@@ -97,6 +99,16 @@ export default function App() {
     setModal(m => (m?.type === 'login' ? null : m))
     if (isEditor) { setEditMode(true); setWantEdit(false) }
   }, [wantEdit, userEmail, isEditor])
+
+  function openTrip(t: Trip) {
+    setTripId(t.id)
+    setSelectedDate(null)
+  }
+
+  function closeTrip() {
+    setTripId(null)
+    setSelectedDate(null)
+  }
 
   function onEditClick() {
     if (editMode) { setEditMode(false); return }
@@ -180,7 +192,7 @@ export default function App() {
               initial={modal.trip}
               onSave={v => {
                 const t: Trip = { id: modal.trip?.id ?? uid(), ...v }
-                void persist(async () => { await store.saveTrip(t); setTripId(t.id) }, { trips: true })
+                void persist(async () => { await store.saveTrip(t); openTrip(t) }, { trips: true })
               }}
               onDelete={modal.trip ? () => deleteTrip(modal.trip!) : undefined}
             />
@@ -248,29 +260,21 @@ export default function App() {
           <span className="brand-emoji">{trip?.emoji || '🧳'}</span>
           <div>
             <h1>{trip?.name ?? 'Travel Planner'}</h1>
-            {trip && (
+            {trip ? (
               <p className="sub">
                 {fmtShort(trip.start_date)} – {fmtShort(trip.end_date)} · {totalDays} days
               </p>
-            )}
+            ) : trips && trips.length > 0 ? (
+              <p className="sub">{trips.length} {trips.length === 1 ? 'plan' : 'plans'}</p>
+            ) : null}
           </div>
         </div>
         <div className="actions">
-          {trips && trips.length > 1 && (
-            <select
-              className="trip-select"
-              value={tripId ?? ''}
-              onChange={e => { setTripId(e.target.value); setSelectedDate(null) }}
-              title="Switch trip"
-            >
-              {trips.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.name}</option>)}
-            </select>
+          {trip && (
+            <button className="btn ghost" onClick={closeTrip} title="Back to all trips">← All trips</button>
           )}
           {editMode && trip && (
             <button className="btn ghost" onClick={() => setModal({ type: 'trip', trip })}>✏️ Trip</button>
-          )}
-          {editMode && (
-            <button className="btn ghost" onClick={() => setModal({ type: 'trip' })}>＋ New trip</button>
           )}
           <button className={'btn' + (editMode ? ' primary' : '')} onClick={onEditClick}>
             {editMode ? '✓ Done' : '🖊️ Edit'}
@@ -320,15 +324,14 @@ export default function App() {
       ) : trips === null ? (
         <div className="empty card">Loading…</div>
       ) : (
-        <div className="empty card">
-          <p className="empty-emoji">🗺️</p>
-          <p>No trips yet — time to dream one up!</p>
-          {editMode ? (
-            <button className="btn primary" onClick={() => setModal({ type: 'trip' })}>＋ Create a trip</button>
-          ) : (
-            <button className="btn primary" onClick={onEditClick}>🖊️ Sign in to start planning</button>
-          )}
-        </div>
+        <TripList
+          trips={trips}
+          editMode={editMode}
+          onOpen={openTrip}
+          onEdit={t => setModal({ type: 'trip', trip: t })}
+          onNew={() => setModal({ type: 'trip' })}
+          onSignIn={onEditClick}
+        />
       )}
 
       <footer className="footer">made with 💛 for our adventures</footer>
