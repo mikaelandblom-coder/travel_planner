@@ -21,6 +21,25 @@ npm install
 npm run dev   # demo mode with sample data at http://localhost:5173
 ```
 
+### Open it without a server
+
+```bash
+npm run build:file
+```
+
+Builds `dist-file/travel-planner.html` — one self-contained file (JS + CSS
+inlined as a classic script at the end of `<body>`, since `file://` blocks
+module scripts). Double-click it to open the planner straight from disk.
+
+Use `npm run watch:file` while working: it rebuilds the file on every save, so
+testing a change is just a refresh of the tab (no hot reload — that needs
+`npm run dev`).
+
+It reads live Supabase data if `.env` holds `VITE_SUPABASE_URL` /
+`VITE_SUPABASE_ANON_KEY` at build time, otherwise it runs in demo mode. The
+Nunito font still comes from Google Fonts, so offline it falls back to a system
+font.
+
 ## Stack
 
 Vite + React + TypeScript, plain CSS, Supabase (Postgres + auth),
