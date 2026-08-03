@@ -22,6 +22,17 @@
     "arrive_date": null
   },
   {
+    "id": "307600cd-0787-48af-9537-7f6b5730a7c5",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "date": "2026-09-18",
+    "from_name": "Stockholm",
+    "to_name": "Paris",
+    "mode": "flight",
+    "notes": "Åk hemmifrån 11:00\n14:10 SK575\nFramme 16:45\nFlygplats: Charles de Gaulle",
+    "created_at": "2026-08-01T09:03:08.213972+00:00",
+    "arrive_date": null
+  },
+  {
     "id": "3601c659-31c5-460f-88ca-b0b5f2e23c52",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "date": "2026-11-30",
@@ -42,6 +53,17 @@
     "notes": "Flyget går 00:05 den 18e men vi behöver vara på flygplatsen den 17e. Landar 07:00",
     "created_at": "2026-07-12T08:18:04.742133+00:00",
     "arrive_date": "2026-11-18"
+  },
+  {
+    "id": "72477f25-4e69-4fef-b908-d418d2e27d96",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "date": "2026-09-22",
+    "from_name": "Paris",
+    "to_name": "Stockholm",
+    "mode": "flight",
+    "notes": "Planet går 10.30 SK574\nFramme 13.00",
+    "created_at": "2026-08-01T09:04:07.362741+00:00",
+    "arrive_date": null
   },
   {
     "id": "78edf5bb-a67e-4f02-b6eb-6412079bdd70",

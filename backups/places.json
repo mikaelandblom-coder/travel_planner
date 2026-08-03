@@ -42,6 +42,20 @@
     "emoji": "🏔️"
   },
   {
+    "id": "2bcb8788-67b9-468c-9a43-5b16ef9e289e",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Tang Freres",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/8vMrHg1FyT4ufMB38",
+    "notes": "",
+    "created_at": "2026-08-01T09:56:25.984461+00:00",
+    "date": "2026-09-21",
+    "start_time": null,
+    "end_time": null,
+    "emoji": "🍍"
+  },
+  {
     "id": "2ce9e238-a07e-4b95-9b66-8ec5db83ebdf",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
@@ -68,6 +82,20 @@
     "start_time": null,
     "end_time": null,
     "emoji": "🧙"
+  },
+  {
+    "id": "3c49ef8d-11a8-4bac-9cde-8f8268261b4b",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Eiffel tornet",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-01T09:32:33.939483+00:00",
+    "date": "2026-09-18",
+    "start_time": "20:00:00",
+    "end_time": "22:00:00",
+    "emoji": "🗼"
   },
   {
     "id": "3d34af48-55fb-487d-b6ae-492d2e8378c0",
@@ -98,6 +126,62 @@
     "emoji": "🏰"
   },
   {
+    "id": "577c0483-5415-45e4-a158-15f2d1bf460a",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Galeries Lafayette",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/9ocEFxJE5peG3YZ56",
+    "notes": "Superfin galleria",
+    "created_at": "2026-08-01T09:55:14.424622+00:00",
+    "date": "2026-09-21",
+    "start_time": null,
+    "end_time": null,
+    "emoji": "🛍️"
+  },
+  {
+    "id": "5a022ad3-e93f-4502-a7b1-a92c073e2eb6",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Köp 10 pack metrobiljetter (t+ tickets)",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Kan köpas direkt i appen\nÄr billigare än 5 dagar biljett Paris Visite som kostar 78€",
+    "created_at": "2026-08-01T09:37:33.04155+00:00",
+    "date": null,
+    "start_time": null,
+    "end_time": null,
+    "emoji": ""
+  },
+  {
+    "id": "5b562f1c-d10b-409b-9e41-ee87f0c6c397",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Hotell",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Kolla hur man åker till hotellet från flygplatsen\nDistrikt 3 - Le Marais\n\nTaxi 65€ fast pris\nPendeltåg RER B 11.8€",
+    "created_at": "2026-08-01T09:07:15.238584+00:00",
+    "date": "2026-09-18",
+    "start_time": "18:00:00",
+    "end_time": "19:00:00",
+    "emoji": "🏨"
+  },
+  {
+    "id": "63c20cb6-1075-46b9-ad7b-49a03d7962f9",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Restaurang",
+    "category": "food",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-01T09:31:54.661105+00:00",
+    "date": "2026-09-18",
+    "start_time": "19:00:00",
+    "end_time": "20:00:00",
+    "emoji": ""
+  },
+  {
     "id": "6bc03b73-4b64-490e-a045-ef7916e58cfd",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
@@ -124,6 +208,20 @@
     "start_time": "10:30:00",
     "end_time": null,
     "emoji": "📷"
+  },
+  {
+    "id": "79901450-9bc2-4260-99dd-ab2179e6a2c9",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Frukost på Cong Caphe",
+    "category": "cafe",
+    "map_url": "https://maps.app.goo.gl/nEgqQ5osmXUzHggk7",
+    "notes": "",
+    "created_at": "2026-08-01T09:44:49.094097+00:00",
+    "date": "2026-09-19",
+    "start_time": "09:00:00",
+    "end_time": "10:00:00",
+    "emoji": ""
   },
   {
     "id": "7e17d2d6-a4e1-4ff7-a6d0-74673ec8e5c4",
@@ -166,6 +264,34 @@
     "start_time": null,
     "end_time": null,
     "emoji": ""
+  },
+  {
+    "id": "a1f7cca5-af8b-495a-8b27-1761d9e86bcb",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Mickisu fyller år",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-01T09:40:21.5625+00:00",
+    "date": "2026-09-19",
+    "start_time": null,
+    "end_time": null,
+    "emoji": "🎂"
+  },
+  {
+    "id": "ad1f0a58-f8d7-4291-8a41-d169c1ffd8fb",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Palace of Versailles",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/zEfiu3rtpqDcRGxBA",
+    "notes": "Ca 30-40m pendeltåg från centrum\nKöp biljett \"Ticket Origine-Destination\" för 8.3€",
+    "created_at": "2026-08-01T09:45:17.948986+00:00",
+    "date": "2026-09-20",
+    "start_time": "10:00:00",
+    "end_time": "15:00:00",
+    "emoji": "🏰"
   },
   {
     "id": "adec063a-2a90-42f9-92aa-164041e2513b",
