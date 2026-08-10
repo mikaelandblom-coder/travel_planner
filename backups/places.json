@@ -14,6 +14,34 @@
     "emoji": "🏢"
   },
   {
+    "id": "05642160-f2dd-41f9-89c1-1fcd800104c5",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Lucka",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-08T08:28:24.684595+00:00",
+    "date": "2026-09-21",
+    "start_time": "16:00:00",
+    "end_time": null,
+    "emoji": "❓"
+  },
+  {
+    "id": "06eac623-0f6d-437c-ae86-40f55889201d",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Middag",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-08T08:15:31.336615+00:00",
+    "date": "2026-09-19",
+    "start_time": "19:00:00",
+    "end_time": "21:00:00",
+    "emoji": "👨‍"
+  },
+  {
     "id": "10e18939-8fa9-428a-a550-82dff91d72bb",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
@@ -26,6 +54,20 @@
     "start_time": null,
     "end_time": null,
     "emoji": "🚣"
+  },
+  {
+    "id": "1e2443cf-4ee6-48ca-9766-ecfa3b266b2a",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Eiffel tornet",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-08T08:16:24.480654+00:00",
+    "date": "2026-09-19",
+    "start_time": "21:00:00",
+    "end_time": "23:00:00",
+    "emoji": "🗼"
   },
   {
     "id": "28ff59b3-a944-4048-a8f2-adbb9b3a9c7c",
@@ -42,16 +84,30 @@
     "emoji": "🏔️"
   },
   {
+    "id": "2a4f7ba7-e294-4762-8c23-9e81b423d2fc",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "District 13 Viet town",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Ät mat + shoppa",
+    "created_at": "2026-08-08T08:21:26.364375+00:00",
+    "date": "2026-09-20",
+    "start_time": "12:30:00",
+    "end_time": null,
+    "emoji": "🪷"
+  },
+  {
     "id": "2bcb8788-67b9-468c-9a43-5b16ef9e289e",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
     "name": "Tang Freres",
     "category": "sight",
-    "map_url": "https://maps.app.goo.gl/8vMrHg1FyT4ufMB38",
+    "map_url": "https://maps.app.goo.gl/H67kHHnLyKQCbugy9",
     "notes": "",
     "created_at": "2026-08-01T09:56:25.984461+00:00",
-    "date": "2026-09-21",
-    "start_time": null,
+    "date": "2026-09-20",
+    "start_time": "13:00:00",
     "end_time": null,
     "emoji": "🍍"
   },
@@ -134,8 +190,8 @@
     "map_url": "https://maps.app.goo.gl/9ocEFxJE5peG3YZ56",
     "notes": "Superfin galleria",
     "created_at": "2026-08-01T09:55:14.424622+00:00",
-    "date": "2026-09-21",
-    "start_time": null,
+    "date": "2026-09-20",
+    "start_time": "11:00:00",
     "end_time": null,
     "emoji": "🛍️"
   },
@@ -168,20 +224,6 @@
     "emoji": "🏨"
   },
   {
-    "id": "63c20cb6-1075-46b9-ad7b-49a03d7962f9",
-    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
-    "stay_id": null,
-    "name": "Restaurang",
-    "category": "food",
-    "map_url": "",
-    "notes": "",
-    "created_at": "2026-08-01T09:31:54.661105+00:00",
-    "date": "2026-09-18",
-    "start_time": "19:00:00",
-    "end_time": "20:00:00",
-    "emoji": ""
-  },
-  {
     "id": "6bc03b73-4b64-490e-a045-ef7916e58cfd",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
@@ -210,6 +252,20 @@
     "emoji": "📷"
   },
   {
+    "id": "718b924a-1865-41b6-a02f-1ec723a8a0b6",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Seine båttur",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Skjut upp till eftermiddag om för varmt",
+    "created_at": "2026-08-08T08:14:24.263844+00:00",
+    "date": "2026-09-19",
+    "start_time": "13:30:00",
+    "end_time": "15:00:00",
+    "emoji": "🛥️"
+  },
+  {
     "id": "79901450-9bc2-4260-99dd-ab2179e6a2c9",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -219,8 +275,8 @@
     "notes": "",
     "created_at": "2026-08-01T09:44:49.094097+00:00",
     "date": "2026-09-19",
-    "start_time": "09:00:00",
-    "end_time": "10:00:00",
+    "start_time": "08:00:00",
+    "end_time": "09:00:00",
     "emoji": ""
   },
   {
@@ -236,6 +292,20 @@
     "start_time": "13:00:00",
     "end_time": null,
     "emoji": "📷"
+  },
+  {
+    "id": "80128285-b590-417d-986e-21f96a014d9c",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Arc de triumphe",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-08T08:19:32.611706+00:00",
+    "date": "2026-09-20",
+    "start_time": "09:00:00",
+    "end_time": null,
+    "emoji": "🏛️"
   },
   {
     "id": "815d9467-76d5-4fa2-9661-1a9af06526dd",
@@ -280,6 +350,20 @@
     "emoji": "🎂"
   },
   {
+    "id": "aaf4bb36-8021-4ac3-b56a-d88a8999a857",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Vila",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-08T08:14:58.052164+00:00",
+    "date": "2026-09-19",
+    "start_time": "15:30:00",
+    "end_time": "18:30:00",
+    "emoji": "🛏️"
+  },
+  {
     "id": "ad1f0a58-f8d7-4291-8a41-d169c1ffd8fb",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -288,9 +372,9 @@
     "map_url": "https://maps.app.goo.gl/zEfiu3rtpqDcRGxBA",
     "notes": "Ca 30-40m pendeltåg från centrum\nKöp biljett \"Ticket Origine-Destination\" för 8.3€",
     "created_at": "2026-08-01T09:45:17.948986+00:00",
-    "date": "2026-09-20",
+    "date": "2026-09-21",
     "start_time": "10:00:00",
-    "end_time": "15:00:00",
+    "end_time": "14:00:00",
     "emoji": "🏰"
   },
   {
@@ -350,6 +434,48 @@
     "emoji": "🛏️"
   },
   {
+    "id": "c0da2442-f106-4498-a047-c0a578559ae8",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Lunch (pho)",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/7B1tRnmt9tZwMJtE7",
+    "notes": "",
+    "created_at": "2026-08-08T09:29:17.586133+00:00",
+    "date": "2026-09-19",
+    "start_time": "13:30:00",
+    "end_time": null,
+    "emoji": "🍴"
+  },
+  {
+    "id": "d3609153-f4b2-4ff0-95a1-55aca0df73af",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Äta buorguignon och stek med pommes",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/YLvMJMyqVS53s9t37",
+    "notes": "",
+    "created_at": "2026-08-08T09:31:18.48598+00:00",
+    "date": null,
+    "start_time": null,
+    "end_time": null,
+    "emoji": ""
+  },
+  {
+    "id": "d7d6ca3a-8ac0-4d4e-bc50-882aa9210037",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Middag (ål)",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/g2nuqByQCoxjnqcf8",
+    "notes": "Shinko",
+    "created_at": "2026-08-08T08:13:22.799235+00:00",
+    "date": "2026-09-18",
+    "start_time": "19:00:00",
+    "end_time": null,
+    "emoji": "😋"
+  },
+  {
     "id": "e22d53a8-846e-404b-b6cb-14accaf0226f",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
@@ -404,5 +530,33 @@
     "start_time": "17:00:00",
     "end_time": null,
     "emoji": "🍾"
+  },
+  {
+    "id": "f7f9123d-b103-43de-8070-b88c54166fdc",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Louvren",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-08T08:11:08.561796+00:00",
+    "date": "2026-09-19",
+    "start_time": "09:30:00",
+    "end_time": "12:30:00",
+    "emoji": "🖼️"
+  },
+  {
+    "id": "ffe0dea0-5e77-4108-a771-013435dbe459",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Lucka för aktiviteter",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-08T08:22:36.968132+00:00",
+    "date": "2026-09-20",
+    "start_time": "16:00:00",
+    "end_time": null,
+    "emoji": "❓"
   }
 ]
