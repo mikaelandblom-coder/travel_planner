@@ -17,15 +17,15 @@
     "id": "05642160-f2dd-41f9-89c1-1fcd800104c5",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
-    "name": "Lucka",
+    "name": "Frukost",
     "category": "sight",
     "map_url": "",
     "notes": "",
     "created_at": "2026-08-08T08:28:24.684595+00:00",
     "date": "2026-09-21",
-    "start_time": "16:00:00",
+    "start_time": "09:00:00",
     "end_time": null,
-    "emoji": "❓"
+    "emoji": "🥐"
   },
   {
     "id": "06eac623-0f6d-437c-ae86-40f55889201d",
@@ -33,7 +33,7 @@
     "stay_id": null,
     "name": "Middag",
     "category": "sight",
-    "map_url": "",
+    "map_url": "https://maps.app.goo.gl/8erZboZdUjxvNLrL6",
     "notes": "",
     "created_at": "2026-08-08T08:15:31.336615+00:00",
     "date": "2026-09-19",
@@ -54,6 +54,20 @@
     "start_time": null,
     "end_time": null,
     "emoji": "🚣"
+  },
+  {
+    "id": "13ffdc3c-07d4-4d9c-9620-1c692d748535",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Napoleons grav",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/1uJywDG5ziLbcdC17",
+    "notes": "",
+    "created_at": "2026-08-16T09:03:33.959457+00:00",
+    "date": "2026-09-21",
+    "start_time": "10:30:00",
+    "end_time": null,
+    "emoji": "🪦"
   },
   {
     "id": "1e2443cf-4ee6-48ca-9766-ecfa3b266b2a",
@@ -126,6 +140,20 @@
     "emoji": "💳"
   },
   {
+    "id": "396a1017-2184-4890-86fd-e73b15ef9bd9",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Hainan middag",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/WaMfeHJUkTbFkt6N7",
+    "notes": "",
+    "created_at": "2026-08-16T09:13:35.898466+00:00",
+    "date": "2026-09-21",
+    "start_time": "16:30:00",
+    "end_time": null,
+    "emoji": "🍴"
+  },
+  {
     "id": "3be8773e-5bff-4d77-9ff0-ede68a8f770f",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
@@ -168,6 +196,34 @@
     "emoji": "🏨"
   },
   {
+    "id": "42f8ac6d-d824-4e86-a300-69f0a419b8b2",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Tracadero",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/MWc3NHmcGTxfTMzd7",
+    "notes": "",
+    "created_at": "2026-08-16T09:02:56.05888+00:00",
+    "date": "2026-09-21",
+    "start_time": "09:30:00",
+    "end_time": null,
+    "emoji": "🪟"
+  },
+  {
+    "id": "472d0103-a720-4188-afa9-026bc7720006",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Av. des Champs-Elysees",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/SCEQGw75vh2JS5ri8",
+    "notes": "",
+    "created_at": "2026-08-16T09:05:56.240063+00:00",
+    "date": "2026-09-20",
+    "start_time": "10:00:00",
+    "end_time": null,
+    "emoji": "💸"
+  },
+  {
     "id": "4d73381e-8a8a-45ad-8774-c974fc0b68bd",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
@@ -182,13 +238,27 @@
     "emoji": "🏰"
   },
   {
+    "id": "4d7f3559-117a-4cc4-a1f6-d0d4f2631bfc",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Notre-Dame",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/RmCNKYou58LqjuWC9",
+    "notes": "",
+    "created_at": "2026-08-16T09:14:18.041566+00:00",
+    "date": "2026-09-21",
+    "start_time": "15:00:00",
+    "end_time": null,
+    "emoji": "⛪"
+  },
+  {
     "id": "577c0483-5415-45e4-a158-15f2d1bf460a",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
     "name": "Galeries Lafayette",
     "category": "sight",
     "map_url": "https://maps.app.goo.gl/9ocEFxJE5peG3YZ56",
-    "notes": "Superfin galleria",
+    "notes": "Superfin galleria\nTar ca 7m att åka tunnelbana från Triumfbågen\nhttps://maps.app.goo.gl/G5EoMF6cv6Pwr6YA8",
     "created_at": "2026-08-01T09:55:14.424622+00:00",
     "date": "2026-09-20",
     "start_time": "11:00:00",
@@ -257,7 +327,7 @@
     "stay_id": null,
     "name": "Seine båttur",
     "category": "sight",
-    "map_url": "",
+    "map_url": "https://maps.app.goo.gl/1dmKFhWMXVRifdBm8",
     "notes": "Skjut upp till eftermiddag om för varmt",
     "created_at": "2026-08-08T08:14:24.263844+00:00",
     "date": "2026-09-19",
@@ -322,6 +392,34 @@
     "emoji": "💵"
   },
   {
+    "id": "85d83181-e2eb-495c-a49a-7577b390c480",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "dda01009-1318-4a08-b7d7-d53131875f9f",
+    "name": "Bitexco fly over",
+    "category": "other",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-16T07:41:26.05269+00:00",
+    "date": null,
+    "start_time": null,
+    "end_time": null,
+    "emoji": ""
+  },
+  {
+    "id": "9093f79f-d260-432a-9153-d557ef62706f",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Luxembourg park",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/UZ55vMVkm2yM3ykH7",
+    "notes": "",
+    "created_at": "2026-08-16T09:06:52.577483+00:00",
+    "date": "2026-09-21",
+    "start_time": "11:30:00",
+    "end_time": null,
+    "emoji": "🌲"
+  },
+  {
     "id": "9dbcb139-c41d-4505-8265-1d991446944e",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
@@ -372,7 +470,7 @@
     "map_url": "https://maps.app.goo.gl/zEfiu3rtpqDcRGxBA",
     "notes": "Ca 30-40m pendeltåg från centrum\nKöp biljett \"Ticket Origine-Destination\" för 8.3€",
     "created_at": "2026-08-01T09:45:17.948986+00:00",
-    "date": "2026-09-21",
+    "date": null,
     "start_time": "10:00:00",
     "end_time": "14:00:00",
     "emoji": "🏰"
@@ -454,7 +552,7 @@
     "name": "Äta buorguignon och stek med pommes",
     "category": "sight",
     "map_url": "https://maps.app.goo.gl/YLvMJMyqVS53s9t37",
-    "notes": "",
+    "notes": "Ring följande nr för att boka bord\n+33 1 43 59 91 06",
     "created_at": "2026-08-08T09:31:18.48598+00:00",
     "date": null,
     "start_time": null,
@@ -474,6 +572,20 @@
     "start_time": "19:00:00",
     "end_time": null,
     "emoji": "😋"
+  },
+  {
+    "id": "e16a50e7-a6d9-4fb6-855d-aaeb243ffd74",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Pantheon",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/hS1QQDMQ2dhthfcF6",
+    "notes": "",
+    "created_at": "2026-08-16T09:08:50.890313+00:00",
+    "date": "2026-09-21",
+    "start_time": "13:30:00",
+    "end_time": null,
+    "emoji": "🏛️"
   },
   {
     "id": "e22d53a8-846e-404b-b6cb-14accaf0226f",
@@ -518,6 +630,20 @@
     "emoji": "🛒"
   },
   {
+    "id": "ef9524bd-64f2-4e90-9df0-bdd1731f7580",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Lunch",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-08-16T09:07:30.073004+00:00",
+    "date": "2026-09-21",
+    "start_time": "12:00:00",
+    "end_time": null,
+    "emoji": "🥕"
+  },
+  {
     "id": "f38323e6-8dcb-49a1-b4d4-c2f2f09b49f3",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
@@ -549,14 +675,14 @@
     "id": "ffe0dea0-5e77-4108-a771-013435dbe459",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
-    "name": "Lucka för aktiviteter",
-    "category": "sight",
-    "map_url": "",
+    "name": "La Defense",
+    "category": "shopping",
+    "map_url": "https://maps.app.goo.gl/zuvMybYW3Qrz7Bb86",
     "notes": "",
     "created_at": "2026-08-08T08:22:36.968132+00:00",
     "date": "2026-09-20",
     "start_time": "16:00:00",
     "end_time": null,
-    "emoji": "❓"
+    "emoji": ""
   }
 ]
