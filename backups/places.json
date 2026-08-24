@@ -70,6 +70,20 @@
     "emoji": "🪦"
   },
   {
+    "id": "1dbde2b7-31f2-45b4-9550-7dbfbcd64977",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Wagyu lunch",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/iVeyfV5dqeuVXnBJ6",
+    "notes": "",
+    "created_at": "2026-08-22T08:58:14.686067+00:00",
+    "date": "2026-11-19",
+    "start_time": "12:00:00",
+    "end_time": null,
+    "emoji": "🍖"
+  },
+  {
     "id": "1e2443cf-4ee6-48ca-9766-ecfa3b266b2a",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -140,6 +154,20 @@
     "emoji": "💳"
   },
   {
+    "id": "37e59782-6225-440a-a33d-f2f6a7cc216d",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Shinsekai",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/W6f1wHbtFr6fVGmJA",
+    "notes": "",
+    "created_at": "2026-08-22T08:50:53.867623+00:00",
+    "date": "2026-11-19",
+    "start_time": "16:30:00",
+    "end_time": null,
+    "emoji": "🗼"
+  },
+  {
     "id": "396a1017-2184-4890-86fd-e73b15ef9bd9",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -180,6 +208,20 @@
     "start_time": "20:00:00",
     "end_time": "22:00:00",
     "emoji": "🗼"
+  },
+  {
+    "id": "3c551200-a078-4415-9cf7-cad6548afe69",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Todai-ji",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/AV6SZ847jAerVqN7A",
+    "notes": "",
+    "created_at": "2026-08-22T08:28:54.652199+00:00",
+    "date": "2026-11-20",
+    "start_time": "10:00:00",
+    "end_time": null,
+    "emoji": ""
   },
   {
     "id": "3d34af48-55fb-487d-b6ae-492d2e8378c0",
@@ -294,10 +336,24 @@
     "emoji": "🏨"
   },
   {
+    "id": "5c2ed8a6-bdfb-47c5-9a77-ab71f2e60405",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Fish market",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/4Luvmk2WwTNLs9yz6",
+    "notes": "",
+    "created_at": "2026-08-22T08:24:21.470379+00:00",
+    "date": "2026-11-19",
+    "start_time": "09:30:00",
+    "end_time": null,
+    "emoji": "🐟"
+  },
+  {
     "id": "6bc03b73-4b64-490e-a045-ef7916e58cfd",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
-    "name": "Boka Universal, Disneyland och Teamlabs",
+    "name": "Boka Universal, Disneyland, Teamlabs, Umeda sky building",
     "category": "sight",
     "map_url": "",
     "notes": "",
@@ -392,6 +448,20 @@
     "emoji": "💵"
   },
   {
+    "id": "820ef5e5-89ee-4943-93a0-c8f26256665b",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Ramen introvert",
+    "category": "food",
+    "map_url": "https://maps.app.goo.gl/LjcmzP4T72Qejoz87",
+    "notes": "",
+    "created_at": "2026-08-22T09:01:00.697278+00:00",
+    "date": "2026-11-19",
+    "start_time": "18:00:00",
+    "end_time": null,
+    "emoji": ""
+  },
+  {
     "id": "85d83181-e2eb-495c-a49a-7577b390c480",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "dda01009-1318-4a08-b7d7-d53131875f9f",
@@ -418,20 +488,6 @@
     "start_time": "11:30:00",
     "end_time": null,
     "emoji": "🌲"
-  },
-  {
-    "id": "9dbcb139-c41d-4505-8265-1d991446944e",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
-    "name": "Kopiera över från google docs",
-    "category": "sight",
-    "map_url": "",
-    "notes": "Förmiddagen Umeda, kvällen Dotonburi",
-    "created_at": "2026-07-18T12:40:11.224622+00:00",
-    "date": "2026-11-18",
-    "start_time": null,
-    "end_time": null,
-    "emoji": ""
   },
   {
     "id": "a1f7cca5-af8b-495a-8b27-1761d9e86bcb",
@@ -482,7 +538,7 @@
     "name": "Köp Shinkensen biljett Kyoto till Tokyo",
     "category": "sight",
     "map_url": "",
-    "notes": "En månad innan vi åker till VN",
+    "notes": "En månad innan vi åker till VN\nKöp på vänster sida Kyoto -> Tokyo (Fuji seat)\nKöp bagageplats",
     "created_at": "2026-07-18T12:56:34.675978+00:00",
     "date": null,
     "start_time": null,
@@ -506,13 +562,13 @@
   {
     "id": "b6817aaf-280b-43ed-966f-499a8d5a3488",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "stay_id": null,
     "name": "Ramen",
     "category": "food",
     "map_url": "https://maps.app.goo.gl/5QumVSsnAvTtzdkX7",
     "notes": "",
     "created_at": "2026-07-18T12:48:18.468747+00:00",
-    "date": "2026-11-18",
+    "date": null,
     "start_time": "12:00:00",
     "end_time": null,
     "emoji": ""
@@ -530,6 +586,20 @@
     "start_time": "07:00:00",
     "end_time": "12:00:00",
     "emoji": "🛏️"
+  },
+  {
+    "id": "bfcaac35-1cb9-4416-9dff-c971c3f02eb9",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Nara",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Platform 1 Osaka Loop Line\nTåget heter Yamatoji Rapid Service mot Nara eller Kamo\nKliv inte på tåget Local Loop\n50 minuter 840 yen\nGår att betala med ICOCA & SUICA",
+    "created_at": "2026-08-22T08:28:33.924188+00:00",
+    "date": "2026-11-20",
+    "start_time": "09:00:00",
+    "end_time": null,
+    "emoji": "🦌"
   },
   {
     "id": "c0da2442-f106-4498-a047-c0a578559ae8",
@@ -558,6 +628,20 @@
     "start_time": null,
     "end_time": null,
     "emoji": ""
+  },
+  {
+    "id": "d7750e69-e512-4c36-a842-f39f1b44aba9",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Sushiro",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/JTkbkLWoBeuhDhcy8",
+    "notes": "",
+    "created_at": "2026-08-22T08:41:29.782014+00:00",
+    "date": "2026-11-18",
+    "start_time": "12:00:00",
+    "end_time": null,
+    "emoji": "🍣"
   },
   {
     "id": "d7d6ca3a-8ac0-4d4e-bc50-882aa9210037",
@@ -604,13 +688,13 @@
   {
     "id": "e3ea62e2-970e-4c47-a1bc-1dc1ac9e3c3d",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "stay_id": null,
     "name": "Sushi belt",
     "category": "sight",
     "map_url": "https://maps.app.goo.gl/gTDWiCBRV8Y1afFZA",
     "notes": "Lyxigare än Uobei",
     "created_at": "2026-07-18T12:47:37.618391+00:00",
-    "date": "2026-11-18",
+    "date": null,
     "start_time": "12:00:00",
     "end_time": null,
     "emoji": "🍣"
@@ -670,6 +754,20 @@
     "start_time": "09:30:00",
     "end_time": "12:30:00",
     "emoji": "🖼️"
+  },
+  {
+    "id": "f9a75842-e3a9-4441-bed1-2a826ad5939b",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Osaka castle",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/TKF7MREN98BZHSyV7",
+    "notes": "",
+    "created_at": "2026-08-22T08:25:21.300958+00:00",
+    "date": "2026-11-19",
+    "start_time": "13:00:00",
+    "end_time": null,
+    "emoji": "🏰"
   },
   {
     "id": "ffe0dea0-5e77-4108-a771-013435dbe459",
