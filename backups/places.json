@@ -616,6 +616,20 @@
     "emoji": "🍴"
   },
   {
+    "id": "d2b42d75-ffe0-4d4c-a0f5-2755951a1c77",
+    "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
+    "stay_id": null,
+    "name": "Lunch",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/jQ8DL628gpmS3PTm6",
+    "notes": "",
+    "created_at": "2026-09-12T09:49:01.2564+00:00",
+    "date": "2026-09-20",
+    "start_time": "12:45:00",
+    "end_time": null,
+    "emoji": "🍜"
+  },
+  {
     "id": "d3609153-f4b2-4ff0-95a1-55aca0df73af",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -726,6 +740,20 @@
     "start_time": "12:00:00",
     "end_time": null,
     "emoji": "🥕"
+  },
+  {
+    "id": "f1f7fb72-a73d-492c-bf47-419cb90624c7",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Tandläkare",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-09-08T08:58:30.885287+00:00",
+    "date": "2026-11-16",
+    "start_time": null,
+    "end_time": null,
+    "emoji": ""
   },
   {
     "id": "f38323e6-8dcb-49a1-b4d4-c2f2f09b49f3",
