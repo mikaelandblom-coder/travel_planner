@@ -15,7 +15,7 @@ type ModalState =
   | { type: 'trip'; trip?: Trip }
   | { type: 'stay'; stay?: Stay; defaultDate?: string }
   | { type: 'leg'; leg?: Leg; defaultDate?: string }
-  | { type: 'place'; place?: Place; defaultStayId?: string | null; defaultDate?: string | null }
+  | { type: 'place'; place?: Place; defaultStayId?: string | null; defaultDate?: string | null; defaultLeftover?: boolean }
   | { type: 'login' }
 
 const errMsg = (e: unknown): string =>
@@ -30,6 +30,7 @@ export default function App() {
   const [trips, setTrips] = useState<Trip[] | null>(null)
   const [tripId, setTripId] = useState<string | null>(null)
   const [data, setData] = useState<TripData>(EMPTY_TRIP_DATA)
+  const [leftovers, setLeftovers] = useState<Place[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -65,17 +66,26 @@ export default function App() {
     }
   }, [store, tripId])
 
+  // Every trip's "next time" list, so this trip can pick ideas up from the
+  // earlier ones. Never fatal: without it you just don't get the suggestions.
+  const refreshLeftovers = useCallback(async () => {
+    try { setLeftovers(await store.listLeftovers()) } catch { setLeftovers([]) }
+  }, [store])
+
   useEffect(() => { void refreshTrips() }, [refreshTrips])
   useEffect(() => { void refreshData() }, [refreshData])
+  useEffect(() => { void refreshLeftovers() }, [refreshLeftovers])
 
   // Pick up edits made on another device when returning to the tab.
   useEffect(() => {
     const onVisible = () => {
-      if (document.visibilityState === 'visible') { void refreshTrips(); void refreshData() }
+      if (document.visibilityState === 'visible') {
+        void refreshTrips(); void refreshData(); void refreshLeftovers()
+      }
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
-  }, [refreshTrips, refreshData])
+  }, [refreshTrips, refreshData, refreshLeftovers])
 
   // Auth (cloud mode only).
   useEffect(() => {
@@ -126,6 +136,7 @@ export default function App() {
       await action()
       if (opts.trips) await refreshTrips()
       await refreshData()
+      await refreshLeftovers()
       setModal(null)
     } catch (e) {
       alert('Could not save: ' + errMsg(e))
@@ -147,6 +158,40 @@ export default function App() {
   function deletePlace(p: Place) {
     if (!confirm(`Remove “${p.name}”?`)) return
     void persist(() => store.deletePlace(p.id))
+  }
+
+  /**
+   * Move a place on / off this trip's "next time" list. Something saved for
+   * next time isn't happening on this trip, so it gives up its day and times.
+   */
+  function toggleLeftover(p: Place) {
+    const next: Place = p.leftover
+      ? { ...p, leftover: false }
+      : { ...p, leftover: true, date: null, start_time: null, end_time: null }
+    void persist(() => store.savePlace(next))
+  }
+
+  /**
+   * Bring an older trip's leftover along on this one: it becomes a fresh
+   * backup idea here, and drops off that trip's next-time list — it found
+   * its next time.
+   */
+  function carryOver(p: Place) {
+    if (!trip) return
+    const copy: Place = {
+      ...p,
+      id: uid(),
+      trip_id: trip.id,
+      stay_id: null, // the old trip's stays mean nothing here
+      date: null,
+      start_time: null,
+      end_time: null,
+      leftover: false,
+    }
+    void persist(async () => {
+      await store.savePlace(copy)
+      await store.savePlace({ ...p, leftover: false })
+    })
   }
 
   /**
@@ -234,6 +279,7 @@ export default function App() {
               stays={data.stays}
               defaultStayId={modal.defaultStayId}
               defaultDate={modal.defaultDate}
+              defaultLeftover={modal.defaultLeftover}
               onSave={v => {
                 const p: Place = { id: modal.place?.id ?? uid(), trip_id: trip!.id, ...v }
                 void persist(() => store.savePlace(p))
@@ -310,15 +356,20 @@ export default function App() {
           <Overview
             trip={trip}
             data={data}
+            trips={trips ?? []}
+            pastLeftovers={leftovers.filter(p => p.trip_id !== trip.id)}
             editMode={editMode}
             onSelectDate={setSelectedDate}
             onEditStay={(stay, defaultDate) => setModal({ type: 'stay', stay, defaultDate })}
             onEditLeg={(leg, defaultDate) => setModal({ type: 'leg', leg, defaultDate })}
-            onEditPlace={(place, defaultStayId, defaultDate) => setModal({ type: 'place', place, defaultStayId, defaultDate })}
+            onEditPlace={(place, defaultStayId, defaultDate, defaultLeftover) =>
+              setModal({ type: 'place', place, defaultStayId, defaultDate, defaultLeftover })}
             onAssignStay={assignStayToDay}
             onDeleteStay={deleteStay}
             onDeleteLeg={deleteLeg}
             onDeletePlace={deletePlace}
+            onToggleLeftover={toggleLeftover}
+            onCarryOver={carryOver}
           />
         </main>
       ) : trips === null ? (
@@ -350,6 +401,7 @@ export default function App() {
           onDeleteStay={deleteStay}
           onDeleteLeg={deleteLeg}
           onDeletePlace={deletePlace}
+          onToggleLeftover={toggleLeftover}
         />
       )}
       {renderModal()}

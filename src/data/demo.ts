@@ -69,6 +69,7 @@ export function seedData(): DB {
     id: uid(), trip_id: tripId,
     stay_id: stayIdx === null ? null : stays[stayIdx].id,
     date, start_time, end_time, name, category, emoji: '', map_url, notes,
+    leftover: false,
   })
 
   const places: Place[] = [
@@ -81,5 +82,46 @@ export function seedData(): DB {
     mkPlace(4, 'Tokyo restaurants', 'list', 'https://maps.app.goo.gl/your-saved-list', 'Google Maps saved list'),
   ]
 
-  return { trips: [trip], stays, legs, places }
+  // A finished trip, so the "next time" list has something to show: the
+  // things we ran out of days for in Paris, waiting for the next plan.
+  const parisId = uid()
+  const paris: Trip = {
+    id: parisId,
+    name: 'Paris',
+    emoji: '🥐',
+    start_date: '2026-04-10',
+    end_date: '2026-04-15',
+  }
+  const parisStay: Stay = {
+    id: uid(), trip_id: parisId, location_name: 'Paris',
+    start_date: '2026-04-10', end_date: '2026-04-15', color: STAY_COLORS[3],
+    map_url: 'https://maps.google.com/?q=Paris', notes: 'Le Marais 🥖',
+  }
+  const mkParisPlace = (
+    name: string, category: string, map_url = '', notes = '', leftover = false,
+  ): Place => ({
+    id: uid(), trip_id: parisId, stay_id: parisStay.id,
+    date: null, start_time: null, end_time: null,
+    name, category, emoji: '', map_url, notes, leftover,
+  })
+
+  const parisPlaces: Place[] = [
+    mkParisPlace('Musée d\'Orsay', 'sight', 'https://maps.google.com/?q=Musee+d+Orsay'),
+    mkParisPlace('Sainte-Chapelle', 'sight', 'https://maps.google.com/?q=Sainte+Chapelle',
+      'Queue was around the block — go at opening', true),
+    mkParisPlace('Marché d\'Aligre', 'food', 'https://maps.google.com/?q=Marche+d+Aligre',
+      'Closed on Mondays, which is exactly when we tried', true),
+    mkParisPlace('A day trip to Versailles', 'nature', '', 'Needs a whole day', true),
+  ]
+
+  return {
+    trips: [trip, paris],
+    stays: [...stays, parisStay],
+    legs: [
+      ...legs,
+      { id: uid(), trip_id: parisId, date: '2026-04-10', arrive_date: null, from_name: 'Home', to_name: 'Paris', mode: 'flight', notes: '' },
+      { id: uid(), trip_id: parisId, date: '2026-04-15', arrive_date: null, from_name: 'Paris', to_name: 'Home', mode: 'flight', notes: '' },
+    ],
+    places: [...places, ...parisPlaces],
+  }
 }

@@ -22,6 +22,9 @@ Follow the three parts below once and you're done.
    paste the whole contents of [`supabase/schema.sql`](supabase/schema.sql), and click **Run**.
    ⚠️ Before running, edit the last lines: replace `mai@example.com` with Mai's
    real email. These two emails are the only ones allowed to edit.
+   Already have the tables from an earlier version? Don't re-run `schema.sql` —
+   run the dated files in [`supabase/`](supabase/) you haven't run yet (same
+   SQL Editor). They only add what's new, so running one twice is harmless.
 4. **Create the two accounts**: under **Authentication → Users → Add user →
    Create new user**, add each editor's email with a password of your choice and
    tick **Auto Confirm User** (so no confirmation email is needed). The emails

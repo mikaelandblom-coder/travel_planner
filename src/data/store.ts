@@ -8,6 +8,8 @@ export interface Store {
   offline: boolean
   listTrips(): Promise<Trip[]>
   loadTrip(tripId: string): Promise<TripData>
+  /** Every place flagged "next time", across all trips. */
+  listLeftovers(): Promise<Place[]>
   saveTrip(t: Trip): Promise<void>
   deleteTrip(id: string): Promise<void>
   saveStay(s: Stay): Promise<void>
@@ -65,6 +67,9 @@ function createDemoStore(): Store {
         places: db.places.filter(p => p.trip_id === tripId),
       })
     },
+    listLeftovers: () => Promise.resolve(
+      load().places.filter(p => p.leftover).sort((a, b) => a.name.localeCompare(b.name)),
+    ),
     saveTrip: (t) => mutate(db => put(db.trips, t)),
     deleteTrip: (id) => mutate(db => {
       db.trips = db.trips.filter(t => t.id !== id)
@@ -136,6 +141,20 @@ function createCloudStore(): Store {
         return data
       } catch (e) {
         const cached = cacheGet<TripData>('trip:' + tripId)
+        if (cached) { store.offline = true; return cached }
+        throw e
+      }
+    },
+
+    async listLeftovers() {
+      try {
+        const { data, error } = await sb.from('places').select('*').eq('leftover', true).order('name')
+        if (error) throw error
+        store.offline = false
+        cachePut('leftovers', data)
+        return data as Place[]
+      } catch (e) {
+        const cached = cacheGet<Place[]>('leftovers')
         if (cached) { store.offline = true; return cached }
         throw e
       }

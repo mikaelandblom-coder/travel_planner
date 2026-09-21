@@ -42,6 +42,8 @@ export type Place = {
   emoji: string // custom emoji; '' = use the category's emoji
   map_url: string
   notes: string
+  /** true = we didn't manage it — keep it for the next trip (never has a day) */
+  leftover: boolean
 }
 
 export type TripData = {

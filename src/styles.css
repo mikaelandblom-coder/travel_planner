@@ -663,6 +663,13 @@ h3.row-title { font-size: 1rem; }
 
 .place-emoji { flex: none; }
 
+/* Saved for next time: still an idea, not a plan — hence the dashed outline. */
+.places li.leftover {
+  background: #fdfaf4;
+  border: 1px dashed var(--line);
+  padding: 5px 7px;
+}
+
 /* Little "📅 date · stay · notes" bits under a place name */
 .sub-bits {
   display: inline-flex;
@@ -800,6 +807,28 @@ h3.row-title { font-size: 1rem; }
 }
 
 .swatch.mode.active { border-color: var(--accent); background: var(--accent-soft); }
+
+/* A checkbox with a label and a line of explanation next to it. */
+.check-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: #faf6f0;
+  cursor: pointer;
+}
+
+.check-field input { margin-top: 3px; flex: none; accent-color: var(--accent); }
+
+.check-field > span {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+}
+
+.check-field .hint { margin: 2px 0 0; }
 
 .form-buttons {
   justify-content: flex-end;

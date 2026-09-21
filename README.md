@@ -6,6 +6,8 @@ A cute, minimal travel planner for two — first stop: **Vietnam & Japan, Nov–
   where we're staying; travel days get a ✈️ / 🚆 / 🚌 badge.
 - **Day details**: tap a day to see the stay, notes, travel legs and saved
   places with Google Maps links.
+- **Next time list**: mark what we didn't manage on a trip (🌱), then bring
+  those ideas along when planning the next one.
 - **View & edit modes**: anyone with the link can look, only we can edit
   (Supabase password login + row-level security).
 - **Multi-trip**: built for future adventures too.

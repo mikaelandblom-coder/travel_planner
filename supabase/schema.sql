@@ -47,10 +47,15 @@ create table places (
   category text not null default 'other',
   emoji text not null default '',  -- custom emoji; '' = use the category's
 
+  -- true = we wanted to but didn't manage it; kept for the next trip
+  leftover boolean not null default false,
   map_url text not null default '',
   notes text not null default '',
   created_at timestamptz not null default now()
 );
+
+-- The "next time" list reads flagged places across all trips.
+create index places_leftover_idx on places (leftover) where leftover;
 
 -- Who may edit. Add a row per allowed email (must match the email they sign in with).
 create table editors (

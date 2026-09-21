@@ -9,22 +9,41 @@ type Props = {
   onSelectDate: (iso: string | null) => void
   onEditStay: (stay?: Stay, defaultDate?: string) => void
   onEditLeg: (leg?: Leg, defaultDate?: string) => void
-  onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null) => void
+  onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null, defaultLeftover?: boolean) => void
   onAssignStay: (stay: Stay, date: string) => void
   onDeleteStay: (s: Stay) => void
   onDeleteLeg: (l: Leg) => void
   onDeletePlace: (p: Place) => void
+  /** Move a place to / from this trip's "next time" list. */
+  onToggleLeftover: (p: Place) => void
 }
 
-/** Trip summary + backup list, shown below the calendar. */
-export function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEditLeg, onEditPlace, onDeleteStay, onDeletePlace }: Props) {
+type OverviewProps = Props & {
+  /** All trips, so leftovers can say which trip they are from. */
+  trips: Trip[]
+  /** Places other trips saved for next time. */
+  pastLeftovers: Place[]
+  /** Copy one of those into this trip (and tick it off the old trip's list). */
+  onCarryOver: (p: Place) => void
+}
+
+/** Trip summary, backup list and the "next time" lists, shown below the calendar. */
+export function Overview({
+  trip, data, trips, pastLeftovers, editMode, onSelectDate,
+  onEditStay, onEditLeg, onEditPlace, onDeleteStay, onDeletePlace,
+  onToggleLeftover, onCarryOver,
+}: OverviewProps) {
   const stays = [...data.stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
   // The backup list: everything not yet allocated to a day. General ideas
   // first, then grouped by stay in trip order.
   const stayStart = (p: Place) => stays.find(s => s.id === p.stay_id)?.start_date ?? ''
   const backup = data.places
-    .filter(p => !p.date)
+    .filter(p => !p.date && !p.leftover)
     .sort((a, b) => stayStart(a).localeCompare(stayStart(b)))
+  // What we didn't manage on this trip, waiting for a future one.
+  const leftovers = data.places
+    .filter(p => p.leftover)
+    .sort((a, b) => stayStart(a).localeCompare(stayStart(b)) || a.name.localeCompare(b.name))
 
   return (
     <aside className="panel card">
@@ -72,13 +91,71 @@ export function Overview({ trip, data, editMode, onSelectDate, onEditStay, onEdi
           </p>
         </>
       )}
-      <PlaceList places={backup} stays={stays} editMode={editMode} onEditPlace={onEditPlace} onDeletePlace={onDeletePlace} />
+      <PlaceList
+        places={backup}
+        stays={stays}
+        editMode={editMode}
+        onEditPlace={onEditPlace}
+        onDeletePlace={onDeletePlace}
+        onToggleLeftover={onToggleLeftover}
+      />
+
+      {(leftovers.length > 0 || editMode) && (
+        <>
+          <h3 className="panel-sub">🌱 Next time</h3>
+          <p className="hint">
+            What we didn't manage on this trip
+            {editMode ? ' — tap 🌱 on any place to move it here.' : '.'}
+          </p>
+        </>
+      )}
+      <PlaceList
+        places={leftovers}
+        stays={stays}
+        editMode={editMode}
+        onEditPlace={onEditPlace}
+        onDeletePlace={onDeletePlace}
+        onToggleLeftover={onToggleLeftover}
+      />
+
+      {editMode && pastLeftovers.length > 0 && (
+        <>
+          <h3 className="panel-sub">💭 Saved from earlier trips</h3>
+          <p className="hint">Tap ＋ to bring one along on this trip.</p>
+          <ul className="places">
+            {pastLeftovers.map(p => {
+              const from = trips.find(t => t.id === p.trip_id)
+              return (
+                <li key={p.id}>
+                  <span className="place-emoji">{placeEmoji(p)}</span>
+                  <span className="row-main">
+                    <span className="row-title">{p.name}</span>
+                    <span className="row-sub sub-bits">
+                      {from && <span>{from.emoji || '🧳'} {from.name}</span>}
+                      {p.notes && <span>{p.notes}</span>}
+                    </span>
+                  </span>
+                  {p.map_url && (
+                    <a className="icon-btn" href={p.map_url} target="_blank" rel="noreferrer" title="Open in Google Maps">📍</a>
+                  )}
+                  <button
+                    className="icon-btn"
+                    title={`Add “${p.name}” to ${trip.name}`}
+                    onClick={() => onCarryOver(p)}
+                  >＋</button>
+                </li>
+              )
+            })}
+          </ul>
+        </>
+      )}
 
       {editMode && (
         <div className="btn-row">
           <button className="btn small" onClick={() => onEditStay(undefined, trip.start_date)}>＋ Stay</button>
           <button className="btn small" onClick={() => onEditLeg(undefined, trip.start_date)}>＋ Travel</button>
           <button className="btn small" onClick={() => onEditPlace(undefined, null)}>＋ Backup idea</button>
+          <button className="btn small" onClick={() => onEditPlace(undefined, null, null, true)}>＋ Next time</button>
         </div>
       )}
     </aside>
@@ -103,7 +180,7 @@ function DayView(props: Props & { date: string }) {
     .sort((a, b) => a.start_date.localeCompare(b.start_date))
   const dayLegs = data.legs.filter(l => l.date === date || l.arrive_date === date)
   const dayVisits = data.places
-    .filter(p => p.date === date)
+    .filter(p => p.date === date && !p.leftover)
     .sort((a, b) => timeKey(a).localeCompare(timeKey(b)))
   const dayN = daysBetween(trip.start_date, date) + 1
   const total = daysBetween(trip.start_date, trip.end_date) + 1
@@ -167,7 +244,13 @@ function DayView(props: Props & { date: string }) {
       {dayVisits.length > 0 && (
         <>
           <h3 className="panel-sub">🍽️ Plans this day</h3>
-          <PlaceList places={dayVisits} editMode={editMode} onEditPlace={props.onEditPlace} onDeletePlace={props.onDeletePlace} />
+          <PlaceList
+            places={dayVisits}
+            editMode={editMode}
+            onEditPlace={props.onEditPlace}
+            onDeletePlace={props.onDeletePlace}
+            onToggleLeftover={props.onToggleLeftover}
+          />
         </>
       )}
 
@@ -226,12 +309,13 @@ function StayPicker({ stays, date, onAssign }: {
   )
 }
 
-function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace }: {
+function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace, onToggleLeftover }: {
   places: Place[]
   stays?: Stay[] // when given, rows show which stay each place belongs to
   editMode: boolean
   onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null) => void
   onDeletePlace: (p: Place) => void
+  onToggleLeftover: (p: Place) => void
 }) {
   if (places.length === 0) return null
   return (
@@ -239,7 +323,7 @@ function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace }: {
       {places.map(p => {
         const stay = stays?.find(s => s.id === p.stay_id)
         return (
-          <li key={p.id}>
+          <li key={p.id} className={p.leftover ? 'leftover' : undefined}>
             <span className="place-emoji">{placeEmoji(p)}</span>
             <span className="row-main">
               <span className="row-title">{p.name}</span>
@@ -256,6 +340,15 @@ function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace }: {
             </span>
             {p.map_url && (
               <a className="icon-btn" href={p.map_url} target="_blank" rel="noreferrer" title="Open in Google Maps">📍</a>
+            )}
+            {editMode && (
+              <button
+                className="icon-btn"
+                title={p.leftover
+                  ? `Plan “${p.name}” on this trip after all`
+                  : `Didn't manage “${p.name}” — save it for next time`}
+                onClick={() => onToggleLeftover(p)}
+              >{p.leftover ? '↩️' : '🌱'}</button>
             )}
             {editMode && <RowActions onEdit={() => onEditPlace(p)} onDelete={() => onDeletePlace(p)} />}
           </li>

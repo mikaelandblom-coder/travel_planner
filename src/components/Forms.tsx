@@ -206,11 +206,12 @@ export function LegForm({ initial, defaultDate, onSave, onDelete }: {
   )
 }
 
-export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, onDelete }: {
+export function PlaceForm({ initial, stays, defaultStayId, defaultDate, defaultLeftover, onSave, onDelete }: {
   initial?: Place
   stays: Stay[]
   defaultStayId?: string | null
   defaultDate?: string | null
+  defaultLeftover?: boolean
   onSave: (v: Omit<Place, 'id' | 'trip_id'>) => void
   onDelete?: () => void
 }) {
@@ -224,6 +225,7 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
   const [endTime, setEndTime] = useState(initial?.end_time?.slice(0, 5) ?? '')
   const [mapUrl, setMapUrl] = useState(initial?.map_url ?? '')
   const [notes, setNotes] = useState(initial?.notes ?? '')
+  const [leftover, setLeftover] = useState(initial?.leftover ?? defaultLeftover ?? false)
 
   const sortedStays = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
 
@@ -232,9 +234,12 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
     if (!name.trim()) return
     onSave({
       name: name.trim(), category, emoji: emoji.trim(),
-      stay_id: stayId || null, date: date || null,
-      start_time: startTime || null, end_time: endTime || null,
-      map_url: mapUrl.trim(), notes: notes.trim(),
+      stay_id: stayId || null,
+      // A "next time" idea belongs to no day — it's waiting for another trip.
+      date: leftover ? null : (date || null),
+      start_time: leftover ? null : (startTime || null),
+      end_time: leftover ? null : (endTime || null),
+      map_url: mapUrl.trim(), notes: notes.trim(), leftover,
     })
   }
 
@@ -277,18 +282,29 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, onSave, 
             ))}
           </select>
         </Field>
-        <Field label="Day (optional)">
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-        </Field>
+        {!leftover && (
+          <Field label="Day (optional)">
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+          </Field>
+        )}
       </div>
-      <div className="field-row">
-        <Field label="Starts (optional)">
-          <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
-        </Field>
-        <Field label="Ends (optional)">
-          <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
-        </Field>
-      </div>
+      {!leftover && (
+        <div className="field-row">
+          <Field label="Starts (optional)">
+            <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
+          </Field>
+          <Field label="Ends (optional)">
+            <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
+          </Field>
+        </div>
+      )}
+      <label className="check-field">
+        <input type="checkbox" checked={leftover} onChange={e => setLeftover(e.target.checked)} />
+        <span>
+          <strong>🌱 Save for next time</strong>
+          <span className="hint">Didn't manage it — keep it for a future trip instead of a day here.</span>
+        </span>
+      </label>
       <Field label="Google Maps link">
         <input type="url" value={mapUrl} onChange={e => setMapUrl(e.target.value)} placeholder="https://maps.app.goo.gl/…" />
       </Field>
