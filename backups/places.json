@@ -45,6 +45,21 @@
     "leftover": false
   },
   {
+    "id": "0898be70-9252-4545-9082-5a7abc31f81d",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Trung Nguyen Legend",
+    "category": "cafe",
+    "map_url": "",
+    "notes": "Dricka äggkaffe",
+    "created_at": "2026-10-05T16:40:52.048118+00:00",
+    "date": "2026-11-15",
+    "start_time": "19:00:00",
+    "end_time": "20:00:00",
+    "emoji": "",
+    "leftover": false
+  },
+  {
     "id": "10e18939-8fa9-428a-a550-82dff91d72bb",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
@@ -165,6 +180,51 @@
     "leftover": false
   },
   {
+    "id": "311003ea-eed7-4f33-8f74-13f53aacab22",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Checka ut",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-10-06T16:26:28.140707+00:00",
+    "date": "2026-11-22",
+    "start_time": "10:00:00",
+    "end_time": null,
+    "emoji": "🏨",
+    "leftover": false
+  },
+  {
+    "id": "357d401c-de89-47fc-b9ce-84483ab07ad8",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Micke spelar boboton",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Ses hemma 20.30",
+    "created_at": "2026-10-05T16:48:51.290021+00:00",
+    "date": "2026-11-17",
+    "start_time": "18:00:00",
+    "end_time": "20:00:00",
+    "emoji": "🏸",
+    "leftover": false
+  },
+  {
+    "id": "36cbdab8-5716-4c3e-ae14-dd2aa7ac2e24",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Frisör",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Micke klipper sig och Mai tvättar håret + massage",
+    "created_at": "2026-10-05T16:45:04.431807+00:00",
+    "date": "2026-11-16",
+    "start_time": "11:00:00",
+    "end_time": "12:00:00",
+    "emoji": "🪮",
+    "leftover": false
+  },
+  {
     "id": "37e59782-6225-440a-a33d-f2f6a7cc216d",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
@@ -192,6 +252,21 @@
     "start_time": "16:30:00",
     "end_time": null,
     "emoji": "🍴",
+    "leftover": false
+  },
+  {
+    "id": "39c0280c-6ebd-42e4-89d6-f33e11e3c7ea",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Checka in",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-10-06T16:25:15.372603+00:00",
+    "date": "2026-11-22",
+    "start_time": "15:00:00",
+    "end_time": null,
+    "emoji": "🏨",
     "leftover": false
   },
   {
@@ -267,6 +342,21 @@
     "start_time": "09:30:00",
     "end_time": null,
     "emoji": "🪟",
+    "leftover": false
+  },
+  {
+    "id": "453d8f8a-1dc1-4970-b89a-9a848a80cb7f",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Duscha och vila",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-10-05T16:39:19.107628+00:00",
+    "date": "2026-11-15",
+    "start_time": "15:00:00",
+    "end_time": "17:00:00",
+    "emoji": "🏨",
     "leftover": false
   },
   {
@@ -375,6 +465,21 @@
     "leftover": false
   },
   {
+    "id": "5f757c7d-329e-4568-b776-70ba656c8887",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Åker tåg till Umeda",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Lämna väskor på hotellet",
+    "created_at": "2026-10-05T16:51:22.839704+00:00",
+    "date": "2026-11-18",
+    "start_time": "07:00:00",
+    "end_time": "08:00:00",
+    "emoji": "🚆",
+    "leftover": false
+  },
+  {
     "id": "6bc03b73-4b64-490e-a045-ef7916e58cfd",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": null,
@@ -399,8 +504,8 @@
     "notes": "Micke följer med en stund sen åker till gymmet? Alternativt kommer Mickisu i slutet.",
     "created_at": "2026-07-18T12:34:51.245981+00:00",
     "date": "2026-11-17",
-    "start_time": "10:30:00",
-    "end_time": null,
+    "start_time": "10:00:00",
+    "end_time": "14:00:00",
     "emoji": "📷",
     "leftover": false
   },
@@ -447,6 +552,21 @@
     "start_time": "13:00:00",
     "end_time": null,
     "emoji": "📷",
+    "leftover": false
+  },
+  {
+    "id": "7fbf4e2b-9a4b-4a86-83a5-0b31c90b2fd9",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "94db101f-50cb-4736-982b-1c44ad807d8b",
+    "name": "Romantic train start",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/UN4AxuwkfWfGgXcP7",
+    "notes": "",
+    "created_at": "2026-10-06T16:30:45.835422+00:00",
+    "date": "2026-11-23",
+    "start_time": null,
+    "end_time": null,
+    "emoji": "🚂",
     "leftover": false
   },
   {
@@ -510,6 +630,21 @@
     "leftover": false
   },
   {
+    "id": "89694830-85d4-47bd-8b30-ad031a8d8265",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "94db101f-50cb-4736-982b-1c44ad807d8b",
+    "name": "Romantic train stop",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/WZ5Rg7CY8f1WvHXD7",
+    "notes": "",
+    "created_at": "2026-10-06T16:31:56.047421+00:00",
+    "date": "2026-11-23",
+    "start_time": null,
+    "end_time": null,
+    "emoji": "🚂",
+    "leftover": false
+  },
+  {
     "id": "89762a0d-dbd2-4ffa-9c63-84e03689e42c",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -540,6 +675,51 @@
     "leftover": false
   },
   {
+    "id": "940fc156-7095-4deb-b12c-30f893f5f808",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Bui Vien street",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/8mB4q63eTvWx8zLG9",
+    "notes": "Äta tre",
+    "created_at": "2026-10-05T16:42:30.850711+00:00",
+    "date": "2026-11-15",
+    "start_time": "20:00:00",
+    "end_time": "21:00:00",
+    "emoji": "💃",
+    "leftover": false
+  },
+  {
+    "id": "96474c2c-3000-4958-9648-bcab4d716f91",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "94db101f-50cb-4736-982b-1c44ad807d8b",
+    "name": "Bambuskog",
+    "category": "nature",
+    "map_url": "https://maps.app.goo.gl/7aukhS9bRSrEKyCBA",
+    "notes": "",
+    "created_at": "2026-10-06T16:29:51.037046+00:00",
+    "date": "2026-11-23",
+    "start_time": null,
+    "end_time": null,
+    "emoji": "",
+    "leftover": false
+  },
+  {
+    "id": "9aeac04c-dfb1-40b7-aabf-fa93c027c14a",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Pho Hoi",
+    "category": "food",
+    "map_url": "",
+    "notes": "Äta pho och dricka vattenmelonjuice",
+    "created_at": "2026-10-05T16:40:00.089449+00:00",
+    "date": "2026-11-15",
+    "start_time": "17:00:00",
+    "end_time": "19:00:00",
+    "emoji": "",
+    "leftover": false
+  },
+  {
     "id": "a1f7cca5-af8b-495a-8b27-1761d9e86bcb",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -567,6 +747,21 @@
     "start_time": "15:30:00",
     "end_time": "18:30:00",
     "emoji": "🛏️",
+    "leftover": false
+  },
+  {
+    "id": "acce1f7d-26dd-4fe5-81f9-7c866e93a582",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Frukost bun bo",
+    "category": "food",
+    "map_url": "",
+    "notes": "Landmark 6",
+    "created_at": "2026-10-05T16:43:45.820969+00:00",
+    "date": "2026-11-16",
+    "start_time": "09:00:00",
+    "end_time": "10:00:00",
+    "emoji": "",
     "leftover": false
   },
   {
@@ -603,10 +798,10 @@
     "id": "b548d57d-18a6-4f05-a983-dfd9a0adbb2d",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
-    "name": "Handa VinMart",
+    "name": "Handla VinMart",
     "category": "sight",
     "map_url": "",
-    "notes": "Köp goda och andra saker",
+    "notes": "Toapapper, vatten, frukt, nuoc dep, chips",
     "created_at": "2026-07-18T12:30:03.68442+00:00",
     "date": "2026-11-15",
     "start_time": "14:00:00",
@@ -640,8 +835,23 @@
     "created_at": "2026-07-18T12:28:18.293961+00:00",
     "date": "2026-11-15",
     "start_time": "07:00:00",
-    "end_time": "12:00:00",
+    "end_time": "12:30:00",
     "emoji": "🛏️",
+    "leftover": false
+  },
+  {
+    "id": "be8a64c2-b8f3-466e-8c5b-baa2f42a2b46",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Banh mi",
+    "category": "sight",
+    "map_url": "https://maps.app.goo.gl/VyHsJFWQhzMC3pnH9",
+    "notes": "Dricka sockerrörjuice",
+    "created_at": "2026-10-05T16:45:58.31625+00:00",
+    "date": "2026-11-16",
+    "start_time": "12:00:00",
+    "end_time": "13:00:00",
+    "emoji": "🥖",
     "leftover": false
   },
   {
@@ -672,6 +882,21 @@
     "start_time": "13:30:00",
     "end_time": null,
     "emoji": "🍴",
+    "leftover": false
+  },
+  {
+    "id": "cdcc7391-8283-49a7-9feb-da16b2c15df6",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Mai åker till Van",
+    "category": "sight",
+    "map_url": "",
+    "notes": "Lämnar 2 väskor hos Van",
+    "created_at": "2026-10-05T16:48:19.718689+00:00",
+    "date": "2026-11-17",
+    "start_time": "16:30:00",
+    "end_time": "20:30:00",
+    "emoji": "👩",
     "leftover": false
   },
   {
@@ -750,6 +975,21 @@
     "leftover": true
   },
   {
+    "id": "dd41de86-82aa-46f9-b55e-cecdbbefdb81",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
+    "name": "Gyoen National Garden",
+    "category": "nature",
+    "map_url": "https://maps.app.goo.gl/w7FPrpPAHb9G2KrJ8",
+    "notes": "",
+    "created_at": "2026-10-06T16:34:42.745425+00:00",
+    "date": "2026-11-22",
+    "start_time": "13:00:00",
+    "end_time": null,
+    "emoji": "",
+    "leftover": false
+  },
+  {
     "id": "e16a50e7-a6d9-4fb6-855d-aaeb243ffd74",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -825,18 +1065,33 @@
     "leftover": false
   },
   {
+    "id": "f19d3518-9d55-41b3-b9f2-eff54545b693",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Åker till flygplatsen",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-10-05T16:49:37.827563+00:00",
+    "date": "2026-11-17",
+    "start_time": "21:00:00",
+    "end_time": "21:30:00",
+    "emoji": "🚗",
+    "leftover": false
+  },
+  {
     "id": "f1f7fb72-a73d-492c-bf47-419cb90624c7",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
     "name": "Tandläkare",
     "category": "sight",
     "map_url": "",
-    "notes": "",
+    "notes": "Tandsten",
     "created_at": "2026-09-08T08:58:30.885287+00:00",
     "date": "2026-11-16",
-    "start_time": null,
-    "end_time": null,
-    "emoji": "",
+    "start_time": "10:00:00",
+    "end_time": "11:00:00",
+    "emoji": "🦷",
     "leftover": false
   },
   {
@@ -882,6 +1137,21 @@
     "start_time": "13:00:00",
     "end_time": null,
     "emoji": "🏰",
+    "leftover": false
+  },
+  {
+    "id": "fd2cbd82-67cb-46af-aa5b-0753e8d651af",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "stay_id": "e6aa1c32-9728-4ade-94e6-7a0ddd64d469",
+    "name": "Träffa Bo & Co Dung",
+    "category": "sight",
+    "map_url": "",
+    "notes": "",
+    "created_at": "2026-10-05T16:46:55.163724+00:00",
+    "date": "2026-11-16",
+    "start_time": "16:00:00",
+    "end_time": "20:00:00",
+    "emoji": "👨",
     "leftover": false
   },
   {
