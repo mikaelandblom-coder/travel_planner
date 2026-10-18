@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import type { Leg, Place, Stay, Trip } from '../types'
 import { modeEmoji, placeEmoji, timeKey } from '../types'
 import { mondayIndex, monthLabel, monthsInRange, todayISO, WEEKDAYS } from '../lib/dates'
@@ -9,7 +9,10 @@ type Props = {
   legs: Leg[]
   places: Place[]
   selectedDate: string | null
+  editMode: boolean
   onSelect: (iso: string) => void
+  /** Hand-set widths for a month ('YYYY-MM'); null = automatic again. */
+  onSaveColWidths: (month: string, widths: number[] | null) => void
 }
 
 /**
@@ -52,7 +55,7 @@ export function CityChips({ stays, selectedDate, onSelect }: {
   )
 }
 
-export function Calendar({ trip, stays, legs, places, selectedDate, onSelect }: Props) {
+export function Calendar({ trip, stays, legs, places, selectedDate, editMode, onSelect, onSaveColWidths }: Props) {
   const sorted = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
   const all = [
     trip.start_date, trip.end_date,
@@ -77,7 +80,9 @@ export function Calendar({ trip, stays, legs, places, selectedDate, onSelect }: 
           places={places}
           selectedDate={selectedDate}
           today={today}
+          editMode={editMode}
           onSelect={onSelect}
+          onSaveColWidths={onSaveColWidths}
         />
       ))}
     </section>
@@ -92,6 +97,56 @@ function legBadge(leg: Leg, iso: string): string {
   return modeEmoji(leg.mode)
 }
 
+// The part of a day the city bands cover; travel outside it is clamped.
+const DAY_START = 7 * 60
+const DAY_END = 23 * 60
+const TRAVEL_BG = '#faf6f0'
+
+const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5))
+const dayFrac = (t: string) => Math.min(1, Math.max(0, (minutes(t) - DAY_START) / (DAY_END - DAY_START)))
+
+/**
+ * A day spent in several cities, as stacked bands from morning (top) to
+ * evening, each as tall as the time spent there. The travel between two
+ * stays sets the split: we leave one at its departure time and reach the
+ * next at its arrival time (the gap in between is travel). Without times,
+ * the cities share the day equally.
+ */
+function cityBands(iso: string, dayStays: Stay[], dayLegs: Leg[]): string {
+  const n = dayStays.length
+  const used = new Set<Leg>()
+  const stops: string[] = []
+  let cursor = 0
+  for (let i = 0; i < n - 1; i++) {
+    const a = dayStays[i]
+    const b = dayStays[i + 1]
+    const leg =
+      dayLegs.find(l => !used.has(l) && l.from_name === a.location_name && l.to_name === b.location_name) ??
+      dayLegs.find(l => !used.has(l) && (l.from_name === a.location_name || l.to_name === b.location_name))
+    if (leg) used.add(leg)
+    const dep = leg?.date === iso && leg.depart_time ? dayFrac(leg.depart_time) : null
+    const arr = leg && (leg.arrive_date ?? leg.date) === iso && leg.arrive_time ? dayFrac(leg.arrive_time)
+      : leg?.arrive_date && leg.arrive_date > iso ? 1 // still travelling at midnight
+      : null
+    const even = (i + 1) / n
+    const leave = Math.max(cursor, dep ?? arr ?? even)
+    const reach = Math.max(leave, arr ?? dep ?? even)
+    stops.push(`${a.color} ${pct(cursor)} ${pct(leave)}`)
+    if (reach > leave) stops.push(`${TRAVEL_BG} ${pct(leave)} ${pct(reach)}`)
+    cursor = reach
+  }
+  stops.push(`${dayStays[n - 1].color} ${pct(cursor)} 100%`)
+  return `linear-gradient(to bottom, ${stops.join(', ')})`
+}
+
+const pct = (f: number) => `${(f * 100).toFixed(1)}%`
+
+/** Time shown on a travel line: departure on the way out, arrival on landing day. */
+function legTime(leg: Leg, iso: string): string {
+  const t = iso === leg.date ? leg.depart_time : leg.arrive_time
+  return t ? t.slice(0, 5) : ''
+}
+
 type MonthProps = {
   year: number
   month: number // 0-based
@@ -101,13 +156,29 @@ type MonthProps = {
   places: Place[]
   selectedDate: string | null
   today: string
+  editMode: boolean
   onSelect: (iso: string) => void
+  onSaveColWidths: (month: string, widths: number[] | null) => void
 }
 
-function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today, onSelect }: MonthProps) {
+const MIN_COL = 0.4 // narrowest a dragged column gets, in fr
+
+function MonthGrid({
+  year, month, trip, stays, legs, places, selectedDate, today, editMode, onSelect, onSaveColWidths,
+}: MonthProps) {
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const offset = mondayIndex(new Date(year, month, 1))
   const pad2 = (n: number) => String(n).padStart(2, '0')
+  const monthKey = `${year}-${pad2(month + 1)}`
+  const saved = trip.col_widths[monthKey]
+
+  // Widths while a column edge is being dragged. Kept after letting go until
+  // the saved widths come back, so the columns don't jump in between.
+  const [dragWidths, setDragWidths] = useState<number[] | null>(null)
+  const drag = useRef<{ edge: number; x: number; start: number[]; pxPerFr: number } | null>(null)
+  const headRef = useRef<HTMLDivElement>(null)
+  const savedKey = JSON.stringify(saved ?? null)
+  useEffect(() => { setDragWidths(null) }, [savedKey])
 
   // Longest activity line per weekday column, so busy columns can get wider.
   const colLen = [0, 0, 0, 0, 0, 0, 0]
@@ -137,8 +208,9 @@ function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today
     if (dayStays.length === 1) {
       style = { background: dayStays[0].color }
     } else if (dayStays.length >= 2) {
-      style = { background: `linear-gradient(135deg, ${dayStays[0].color} 0 50%, ${dayStays[1].color} 50% 100%)` }
+      style = { background: cityBands(iso, dayStays, dayLegs) }
     }
+    const planned = trip.planned_days.includes(iso)
 
     const cls = ['day']
     if (!inTrip && dayStays.length === 0 && dayLegs.length === 0) cls.push('dim')
@@ -154,10 +226,12 @@ function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today
         title={dayStays.map(s => s.location_name).join(' → ') || undefined}
       >
         <span className="daynum">{d}</span>
+        {planned && <span className="day-planned" title="Planning done">✓</span>}
         {(dayLegs.length > 0 || dayPlaces.length > 0) && (
           <span className="day-acts">
             {dayLegs.map(l => (
               <span key={l.id} className="day-act leg">
+                {legTime(l, iso) && <span className="day-act-time">{legTime(l, iso)}</span>}
                 {legBadge(l, iso)} {l.from_name} → {l.to_name}
               </span>
             ))}
@@ -175,17 +249,70 @@ function MonthGrid({ year, month, trip, stays, legs, places, selectedDate, today
   }
 
   // Unequal columns: a column's width grows with its longest line (capped so
-  // quiet days keep a usable minimum). ≤14 chars stays at 1fr.
-  const template = colLen
-    .map(len => `minmax(0, ${Math.min(2.4, Math.max(1, len / 14)).toFixed(2)}fr)`)
-    .join(' ')
+  // quiet days keep a usable minimum). ≤14 chars stays at 1fr. Widths set by
+  // hand in edit mode win over that.
+  const auto = colLen.map(len => Math.min(2.4, Math.max(1, len / 14)))
+  const widths = dragWidths ?? (saved?.length === 7 ? saved : auto)
+  const template = widths.map(w => `minmax(0, ${w.toFixed(2)}fr)`).join(' ')
+
+  // Dragging the edge between two columns trades width between just those
+  // two, so the rest of the month keeps its shape.
+  function startDrag(e: PointerEvent<HTMLSpanElement>, edge: number) {
+    const grid = headRef.current
+    if (!grid) return
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    const gap = parseFloat(getComputedStyle(grid).columnGap) || 0
+    const total = widths.reduce((a, b) => a + b, 0)
+    drag.current = { edge, x: e.clientX, start: widths, pxPerFr: (grid.clientWidth - 6 * gap) / total }
+    setDragWidths(widths)
+  }
+  function moveDrag(e: PointerEvent<HTMLSpanElement>) {
+    const g = drag.current
+    if (!g) return
+    const pair = g.start[g.edge] + g.start[g.edge + 1]
+    const left = Math.min(pair - MIN_COL, Math.max(MIN_COL, g.start[g.edge] + (e.clientX - g.x) / g.pxPerFr))
+    const next = [...g.start]
+    next[g.edge] = left
+    next[g.edge + 1] = pair - left
+    setDragWidths(next)
+  }
+  function endDrag() {
+    const g = drag.current
+    if (!g) return
+    drag.current = null
+    // A tap on the edge without moving it isn't a choice to pin the widths.
+    if (!dragWidths || dragWidths.every((w, i) => w === g.start[i])) { setDragWidths(null); return }
+    onSaveColWidths(monthKey, dragWidths.map(w => Math.round(w * 100) / 100))
+  }
 
   return (
     <div className="month card">
-      <h2 className="month-title">{monthLabel(year, month)}</h2>
-      <div className="grid weekdays" style={{ gridTemplateColumns: template }}>
-        {WEEKDAYS.map(w => (
-          <div key={w} className={'wd' + (w === 'Sat' || w === 'Sun' ? ' wknd' : '')}>{w}</div>
+      <h2 className="month-title">
+        {monthLabel(year, month)}
+        {editMode && saved && (
+          <button
+            className="icon-btn month-reset"
+            title="Back to automatic column widths"
+            onClick={() => onSaveColWidths(monthKey, null)}
+          >↺</button>
+        )}
+      </h2>
+      <div ref={headRef} className="grid weekdays" style={{ gridTemplateColumns: template }}>
+        {WEEKDAYS.map((w, i) => (
+          <div key={w} className={'wd' + (w === 'Sat' || w === 'Sun' ? ' wknd' : '')}>
+            {w}
+            {editMode && i < 6 && (
+              <span
+                className="col-handle"
+                title="Drag to resize the columns"
+                onPointerDown={e => startDrag(e, i)}
+                onPointerMove={moveDrag}
+                onPointerUp={endDrag}
+                onPointerCancel={endDrag}
+              />
+            )}
+          </div>
         ))}
       </div>
       <div className="grid days" style={{ gridTemplateColumns: template }}>{cells}</div>

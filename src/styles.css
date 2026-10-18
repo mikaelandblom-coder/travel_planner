@@ -422,6 +422,43 @@ textarea { resize: vertical; }
 
 .wd.wknd { color: #c9a2b0; }
 
+/* Edit mode: drag the edge between two weekday headers to resize columns.
+   The handle sits in the 6px grid gap. */
+.wd { position: relative; }
+
+.col-handle {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  right: -9px;
+  width: 12px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 2;
+}
+
+.col-handle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: background 0.12s ease;
+}
+
+.col-handle:hover::after,
+.col-handle:active::after { background: var(--accent); }
+
+.month-reset {
+  margin-left: 4px;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
 .day {
   position: relative;
   font-family: var(--font);
@@ -457,6 +494,18 @@ textarea { resize: vertical; }
 .day.selected {
   box-shadow: 0 0 0 3px var(--accent);
   z-index: 1;
+}
+
+/* Planning for this day is done: a quiet tick in the corner. */
+.day-planned {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #4f9a6a;
+  opacity: 0.8;
 }
 
 .day.today .daynum {
@@ -521,6 +570,7 @@ textarea { resize: vertical; }
 
 @media (max-width: 600px) {
   .day { min-height: 72px; padding: 4px 4px; }
+  .day-planned { top: 4px; right: 4px; }
   .day-act { font-size: 0.56rem; padding: 1px 3px; }
 }
 
@@ -683,6 +733,45 @@ h3.row-title { font-size: 1rem; }
 }
 
 .place-emoji { flex: none; }
+
+/* To-do list: done ones fade and get struck through. */
+.places li.todo input[type='checkbox'] {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0 2px;
+  accent-color: #4f9a6a;
+  cursor: pointer;
+}
+
+.places li.todo input[type='checkbox']:disabled { cursor: default; }
+
+.places li.todo.done .row-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.places li.todo.done { opacity: 0.75; }
+
+.todo-add {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+
+.todo-add input { flex: 1; min-width: 0; padding: 6px 10px; }
+
+.planned-tag {
+  margin-left: 8px;
+  color: #4f9a6a;
+  font-weight: 800;
+}
+
+.btn.planned-on {
+  background: #e3f3e8;
+  border-color: #c9e8d2;
+  color: #3f7d55;
+}
 
 /* Saved for next time: still an idea, not a plan — hence the dashed outline. */
 .places li.leftover {

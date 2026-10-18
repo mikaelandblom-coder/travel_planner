@@ -112,7 +112,7 @@ export function CityForm({ initial, cities, onSave, onDelete }: {
 
 export function TripForm({ initial, onSave, onDelete }: {
   initial?: Trip
-  onSave: (v: Omit<Trip, 'id'>) => void
+  onSave: (v: Pick<Trip, 'name' | 'emoji' | 'start_date' | 'end_date'>) => void
   onDelete?: () => void
 }) {
   const [name, setName] = useState(initial?.name ?? '')
@@ -239,6 +239,9 @@ export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
 }) {
   const [date, setDate] = useState(initial?.date ?? defaultDate ?? '')
   const [arrive, setArrive] = useState(initial?.arrive_date ?? '')
+  // DB time columns come back as 'HH:MM:SS' — the time input wants 'HH:MM'.
+  const [departTime, setDepartTime] = useState(initial?.depart_time?.slice(0, 5) ?? '')
+  const [arriveTime, setArriveTime] = useState(initial?.arrive_time?.slice(0, 5) ?? '')
   const [from, setFrom] = useState(initial?.from_name ?? '')
   const [to, setTo] = useState(initial?.to_name ?? '')
   const [mode, setMode] = useState<TravelMode>(initial?.mode ?? 'flight')
@@ -249,7 +252,10 @@ export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
     if (!date || !from.trim() || !to.trim()) return
     let [dep, arr] = arrive ? ordered(date, arrive) : [date, null as string | null]
     if (arr === dep) arr = null // same day → no separate arrival
-    onSave({ date: dep, arrive_date: arr, from_name: from.trim(), to_name: to.trim(), mode, notes: notes.trim() })
+    onSave({
+      date: dep, arrive_date: arr, depart_time: departTime || null, arrive_time: arriveTime || null,
+      from_name: from.trim(), to_name: to.trim(), mode, notes: notes.trim(),
+    })
   }
 
   return (
@@ -260,6 +266,14 @@ export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
         </Field>
         <Field label="Arrival (if other day)">
           <input type="date" value={arrive} onChange={e => setArrive(e.target.value)} />
+        </Field>
+      </div>
+      <div className="field-row">
+        <Field label="Departs at (optional)">
+          <input type="time" value={departTime} onChange={e => setDepartTime(e.target.value)} />
+        </Field>
+        <Field label="Arrives at (optional)">
+          <input type="time" value={arriveTime} onChange={e => setArriveTime(e.target.value)} />
         </Field>
       </div>
       <div className="field-row">

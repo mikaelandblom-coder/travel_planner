@@ -9,6 +9,8 @@ create table trips (
   emoji text not null default '🧳',
   start_date date not null,
   end_date date not null,
+  planned_days date[] not null default '{}',  -- days whose planning is done
+  col_widths jsonb not null default '{}',     -- hand-set calendar column widths per month
   created_at timestamptz not null default now()
 );
 
@@ -37,6 +39,8 @@ create table legs (
   trip_id uuid not null references trips (id) on delete cascade,
   date date not null,          -- departure day
   arrive_date date,            -- arrival day if different (overnight flights)
+  depart_time time,            -- optional, sizes the city bands on the calendar
+  arrive_time time,
   from_name text not null,
   to_name text not null,
   mode text not null default 'flight',
@@ -66,6 +70,16 @@ create table places (
 -- The "next time" list reads flagged places across all trips.
 create index places_leftover_idx on places (leftover) where leftover;
 
+-- Things to tick off before / during a trip (book tickets, buy a SIM…).
+create table todos (
+  id uuid primary key default gen_random_uuid(),
+  trip_id uuid not null references trips (id) on delete cascade,
+  text text not null,
+  notes text not null default '',
+  done boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
 -- Who may edit. Add a row per allowed email (must match the email they sign in with).
 create table editors (
   email text primary key
@@ -78,6 +92,7 @@ alter table trips enable row level security;
 alter table stays enable row level security;
 alter table legs enable row level security;
 alter table places enable row level security;
+alter table todos enable row level security;
 alter table editors enable row level security;
 
 -- True when the signed-in user's email is in the editors table.
@@ -100,6 +115,7 @@ create policy "public read trips" on trips for select using (true);
 create policy "public read stays" on stays for select using (true);
 create policy "public read legs" on legs for select using (true);
 create policy "public read places" on places for select using (true);
+create policy "public read todos" on todos for select using (true);
 
 -- Only editors can write.
 create policy "editors write cities" on cities
@@ -111,6 +127,8 @@ create policy "editors write stays" on stays
 create policy "editors write legs" on legs
   for all to authenticated using (is_editor()) with check (is_editor());
 create policy "editors write places" on places
+  for all to authenticated using (is_editor()) with check (is_editor());
+create policy "editors write todos" on todos
   for all to authenticated using (is_editor()) with check (is_editor());
 
 -- Signed-in users can check their own editor status (the app uses this

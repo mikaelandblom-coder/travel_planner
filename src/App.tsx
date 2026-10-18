@@ -3,7 +3,7 @@ import { createStore } from './data/store'
 import { supabase } from './supabaseClient'
 import {
   EMPTY_TRIP_DATA, STAY_COLORS,
-  type City, type Leg, type Place, type Stay, type Trip, type TripData,
+  type City, type Leg, type Place, type Stay, type Todo, type Trip, type TripData,
 } from './types'
 import { daysBetween, fmtShort } from './lib/dates'
 import { Calendar, CityChips } from './components/Calendar'
@@ -185,6 +185,45 @@ export default function App() {
     void persist(() => store.savePlace(next))
   }
 
+  function saveTodo(t: Todo) {
+    void persist(() => store.saveTodo(t))
+  }
+  function addTodo(text: string) {
+    if (!trip) return
+    saveTodo({ id: uid(), trip_id: trip.id, text, notes: '', done: false })
+  }
+  function deleteTodo(t: Todo) {
+    if (!confirm(`Remove “${t.text}” from the to-do list?`)) return
+    void persist(() => store.deleteTodo(t.id))
+  }
+
+  /** A backup idea that is really a chore (“book tickets”) becomes a to-do. */
+  function placeToTodo(p: Place) {
+    const todo: Todo = { id: uid(), trip_id: p.trip_id, text: p.name, notes: p.notes, done: false }
+    void persist(async () => {
+      await store.saveTodo(todo)
+      await store.deletePlace(p.id)
+    })
+  }
+
+  /** Tick a day as fully planned (or un-tick it). */
+  function togglePlanned(date: string) {
+    if (!trip) return
+    const planned_days = trip.planned_days.includes(date)
+      ? trip.planned_days.filter(d => d !== date)
+      : [...trip.planned_days, date].sort()
+    void persist(() => store.saveTrip({ ...trip, planned_days }), { trips: true })
+  }
+
+  /** Hand-set column widths for one month; null = back to automatic. */
+  function saveColWidths(month: string, widths: number[] | null) {
+    if (!trip) return
+    const col_widths = { ...trip.col_widths }
+    if (widths) col_widths[month] = widths
+    else delete col_widths[month]
+    void persist(() => store.saveTrip({ ...trip, col_widths }), { trips: true })
+  }
+
   /**
    * Bring an older trip's leftover along on this one: it becomes a fresh
    * backup idea here, and drops off that trip's next-time list — it found
@@ -254,7 +293,12 @@ export default function App() {
             <TripForm
               initial={modal.trip}
               onSave={v => {
-                const t: Trip = { id: modal.trip?.id ?? uid(), ...v }
+                const t: Trip = {
+                  id: modal.trip?.id ?? uid(),
+                  planned_days: modal.trip?.planned_days ?? [],
+                  col_widths: modal.trip?.col_widths ?? {},
+                  ...v,
+                }
                 void persist(async () => { await store.saveTrip(t); openTrip(t) }, { trips: true })
               }}
               onDelete={modal.trip ? () => deleteTrip(modal.trip!) : undefined}
@@ -395,7 +439,9 @@ export default function App() {
             legs={data.legs}
             places={data.places}
             selectedDate={selectedDate}
+            editMode={editMode}
             onSelect={setSelectedDate}
+            onSaveColWidths={saveColWidths}
           />
           <Overview
             trip={trip}
@@ -415,6 +461,10 @@ export default function App() {
             onDeletePlace={deletePlace}
             onToggleLeftover={toggleLeftover}
             onCarryOver={carryOver}
+            onAddTodo={addTodo}
+            onSaveTodo={saveTodo}
+            onDeleteTodo={deleteTodo}
+            onPlaceToTodo={placeToTodo}
           />
         </main>
       ) : trips === null ? (
@@ -449,6 +499,7 @@ export default function App() {
           onDeleteLeg={deleteLeg}
           onDeletePlace={deletePlace}
           onToggleLeftover={toggleLeftover}
+          onTogglePlanned={togglePlanned}
         />
       )}
       {renderModal()}
