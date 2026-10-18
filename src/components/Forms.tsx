@@ -1,5 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import type { Leg, Place, Stay, Trip, TravelMode } from '../types'
+import type { City, Leg, Place, Stay, Trip, TravelMode } from '../types'
 import { MODES, PLACE_CATEGORIES, STAY_COLORS } from '../types'
 import { addDays, fmtShort } from '../lib/dates'
 import { supabase } from '../supabaseClient'
@@ -45,6 +45,71 @@ function FormButtons({ onDelete, deleteLabel }: { onDelete?: () => void; deleteL
 /** Return [earlier, later] so a swapped range never breaks the calendar. */
 const ordered = (a: string, b: string): [string, string] => (a <= b ? [a, b] : [b, a])
 
+const byName = (cities: City[]) => [...cities].sort((a, b) => a.name.localeCompare(b.name))
+
+/** A colour no city has yet, so new cities stand apart on the calendar. */
+const freshColor = (cities: City[]) =>
+  STAY_COLORS.find(c => !cities.some(x => x.color === c)) ?? STAY_COLORS[cities.length % STAY_COLORS.length]
+
+function ColorSwatches({ value, onChange }: { value: string; onChange: (c: string) => void }) {
+  return (
+    <div className="swatches">
+      {STAY_COLORS.map(c => (
+        <button
+          type="button"
+          key={c}
+          className={'swatch' + (c === value ? ' active' : '')}
+          style={{ background: c }}
+          onClick={() => onChange(c)}
+          title={c}
+        />
+      ))}
+    </div>
+  )
+}
+
+/** Every city name, for the travel From / To suggestions. */
+function CityOptions({ id, cities }: { id: string; cities: City[] }) {
+  return (
+    <datalist id={id}>
+      {byName(cities).map(c => <option key={c.id} value={c.name} />)}
+    </datalist>
+  )
+}
+
+export function CityForm({ initial, cities, onSave, onDelete }: {
+  initial?: City
+  cities: City[]
+  onSave: (v: Omit<City, 'id'>) => void
+  onDelete?: () => void
+}) {
+  const [name, setName] = useState(initial?.name ?? '')
+  const [color, setColor] = useState(initial?.color ?? freshColor(cities))
+  const taken = cities.some(c => c.id !== initial?.id && c.name.toLowerCase() === name.trim().toLowerCase())
+
+  function submit(e: FormEvent) {
+    e.preventDefault()
+    if (!name.trim() || taken) return
+    onSave({ name: name.trim(), color })
+  }
+
+  return (
+    <form onSubmit={submit}>
+      <Field label="City">
+        <input value={name} onChange={e => setName(e.target.value)} required placeholder="Hanoi" />
+      </Field>
+      {taken && <p className="hint">{name.trim()} is already on the list.</p>}
+      <Field label="Colour">
+        <ColorSwatches value={color} onChange={setColor} />
+      </Field>
+      {initial && (
+        <p className="hint">Renaming or recolouring updates every stay in {initial.name}, on all trips.</p>
+      )}
+      <FormButtons onDelete={onDelete} deleteLabel="Remove city" />
+    </form>
+  )
+}
+
 export function TripForm({ initial, onSave, onDelete }: {
   initial?: Trip
   onSave: (v: Omit<Trip, 'id'>) => void
@@ -85,34 +150,67 @@ export function TripForm({ initial, onSave, onDelete }: {
   )
 }
 
-export function StayForm({ initial, defaultDate, onSave, onDelete }: {
+const NEW_CITY = '\u0000new'
+
+/** Stays pick their city from the shared list (or add a new one to it). */
+export function StayForm({ initial, defaultDate, cities, onSave, onDelete }: {
   initial?: Stay
   defaultDate?: string
+  cities: City[]
   onSave: (v: Omit<Stay, 'id' | 'trip_id'>) => void
   onDelete?: () => void
 }) {
-  const [name, setName] = useState(initial?.location_name ?? '')
+  // An older stay whose city isn't on the list still shows as itself.
+  const options: City[] = byName(cities)
+  if (initial && !cities.some(c => c.name === initial.location_name)) {
+    options.unshift({ id: initial.id, name: initial.location_name, color: initial.color })
+  }
+  const [pick, setPick] = useState(initial?.location_name ?? (options.length ? '' : NEW_CITY))
+  const [newName, setNewName] = useState('')
+  const [newColor, setNewColor] = useState(freshColor(cities))
   const [start, setStart] = useState(initial?.start_date ?? defaultDate ?? '')
   const [end, setEnd] = useState(initial?.end_date ?? (defaultDate ? addDays(defaultDate, 3) : ''))
-  const [color, setColor] = useState(initial?.color ?? STAY_COLORS[0])
   const [mapUrl, setMapUrl] = useState(initial?.map_url ?? '')
   const [notes, setNotes] = useState(initial?.notes ?? '')
 
+  // A typed name that's already on the list just picks that city.
+  const typed = options.find(c => c.name.toLowerCase() === newName.trim().toLowerCase())
+  const city: City | undefined = pick === NEW_CITY
+    ? typed ?? (newName.trim() ? { id: '', name: newName.trim(), color: newColor } : undefined)
+    : options.find(c => c.name === pick)
+
   function submit(e: FormEvent) {
     e.preventDefault()
-    if (!name.trim() || !start || !end) return
+    if (!city || !start || !end) return
     const [a, b] = ordered(start, end)
     onSave({
-      location_name: name.trim(), start_date: a, end_date: b,
-      color, map_url: mapUrl.trim(), notes: notes.trim(),
+      location_name: city.name, start_date: a, end_date: b,
+      color: city.color, map_url: mapUrl.trim(), notes: notes.trim(),
     })
   }
 
   return (
     <form onSubmit={submit}>
-      <Field label="Where">
-        <input value={name} onChange={e => setName(e.target.value)} required placeholder="Hanoi" />
+      <Field label="City">
+        <select value={pick} onChange={e => setPick(e.target.value)} required>
+          <option value="" disabled>Pick a city…</option>
+          {options.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+          <option value={NEW_CITY}>＋ New city…</option>
+        </select>
       </Field>
+      {pick === NEW_CITY && (
+        <>
+          <Field label="New city">
+            <input value={newName} onChange={e => setNewName(e.target.value)} required placeholder="Hanoi" autoFocus />
+          </Field>
+          {!typed && (
+            <Field label="Colour">
+              <ColorSwatches value={newColor} onChange={setNewColor} />
+            </Field>
+          )}
+          <p className="hint">{typed ? `${typed.name} is already on the list — we'll use it.` : 'It joins the city list on the start page.'}</p>
+        </>
+      )}
       <div className="field-row">
         <Field label="Arrive">
           <input type="date" value={start} onChange={e => setStart(e.target.value)} required />
@@ -121,20 +219,6 @@ export function StayForm({ initial, defaultDate, onSave, onDelete }: {
           <input type="date" value={end} onChange={e => setEnd(e.target.value)} required />
         </Field>
       </div>
-      <Field label="Colour">
-        <div className="swatches">
-          {STAY_COLORS.map(c => (
-            <button
-              type="button"
-              key={c}
-              className={'swatch' + (c === color ? ' active' : '')}
-              style={{ background: c }}
-              onClick={() => setColor(c)}
-              title={c}
-            />
-          ))}
-        </div>
-      </Field>
       <Field label="Google Maps link">
         <input type="url" value={mapUrl} onChange={e => setMapUrl(e.target.value)} placeholder="https://maps.app.goo.gl/…" />
       </Field>
@@ -146,9 +230,10 @@ export function StayForm({ initial, defaultDate, onSave, onDelete }: {
   )
 }
 
-export function LegForm({ initial, defaultDate, onSave, onDelete }: {
+export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
   initial?: Leg
   defaultDate?: string
+  cities: City[]
   onSave: (v: Omit<Leg, 'id' | 'trip_id'>) => void
   onDelete?: () => void
 }) {
@@ -179,12 +264,13 @@ export function LegForm({ initial, defaultDate, onSave, onDelete }: {
       </div>
       <div className="field-row">
         <Field label="From">
-          <input value={from} onChange={e => setFrom(e.target.value)} required placeholder="Hanoi" />
+          <input value={from} onChange={e => setFrom(e.target.value)} required placeholder="Hanoi" list="leg-cities" />
         </Field>
         <Field label="To">
-          <input value={to} onChange={e => setTo(e.target.value)} required placeholder="Ha Long Bay" />
+          <input value={to} onChange={e => setTo(e.target.value)} required placeholder="Ha Long Bay" list="leg-cities" />
         </Field>
       </div>
+      <CityOptions id="leg-cities" cities={cities} />
       <Field label="How">
         <div className="swatches">
           {MODES.map(m => (
@@ -206,9 +292,10 @@ export function LegForm({ initial, defaultDate, onSave, onDelete }: {
   )
 }
 
-export function PlaceForm({ initial, stays, defaultStayId, defaultDate, defaultLeftover, onSave, onDelete }: {
+export function PlaceForm({ initial, stays, cities, defaultStayId, defaultDate, defaultLeftover, onSave, onDelete }: {
   initial?: Place
   stays: Stay[]
+  cities: City[]
   defaultStayId?: string | null
   defaultDate?: string | null
   defaultLeftover?: boolean
@@ -219,6 +306,7 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, defaultL
   const [category, setCategory] = useState(initial?.category ?? 'sight')
   const [emoji, setEmoji] = useState(initial?.emoji ?? '')
   const [stayId, setStayId] = useState<string>(initial?.stay_id ?? defaultStayId ?? '')
+  const [city, setCity] = useState(initial?.city ?? '')
   const [date, setDate] = useState(initial?.date ?? defaultDate ?? '')
   // DB time columns come back as 'HH:MM:SS' — the time input wants 'HH:MM'.
   const [startTime, setStartTime] = useState(initial?.start_time?.slice(0, 5) ?? '')
@@ -228,6 +316,8 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, defaultL
   const [leftover, setLeftover] = useState(initial?.leftover ?? defaultLeftover ?? false)
 
   const sortedStays = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
+  const cityOptions = byName(cities)
+  if (city && !cities.some(c => c.name === city)) cityOptions.unshift({ id: '', name: city, color: '' })
 
   function submit(e: FormEvent) {
     e.preventDefault()
@@ -235,6 +325,9 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, defaultL
     onSave({
       name: name.trim(), category, emoji: emoji.trim(),
       stay_id: stayId || null,
+      // Kept from the stay too, so the place still knows its city if the
+      // stay goes — and later trips to that city can offer it.
+      city: stays.find(s => s.id === stayId)?.location_name ?? city,
       // A "next time" idea belongs to no day — it's waiting for another trip.
       date: leftover ? null : (date || null),
       start_time: leftover ? null : (startTime || null),
@@ -282,12 +375,20 @@ export function PlaceForm({ initial, stays, defaultStayId, defaultDate, defaultL
             ))}
           </select>
         </Field>
-        {!leftover && (
-          <Field label="Day (optional)">
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        {!stayId && (
+          <Field label="City">
+            <select value={city} onChange={e => setCity(e.target.value)}>
+              <option value="">🌍 Anywhere</option>
+              {cityOptions.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+            </select>
           </Field>
         )}
       </div>
+      {!leftover && (
+        <Field label="Day (optional)">
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        </Field>
+      )}
       {!leftover && (
         <div className="field-row">
           <Field label="Starts (optional)">

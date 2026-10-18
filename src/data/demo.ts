@@ -1,7 +1,18 @@
-import type { Leg, Place, Stay, Trip } from '../types'
+import type { City, Leg, Place, Stay, Trip } from '../types'
 import { STAY_COLORS } from '../types'
 
-export type DB = { trips: Trip[]; stays: Stay[]; legs: Leg[]; places: Place[] }
+export type DB = { cities: City[]; trips: Trip[]; stays: Stay[]; legs: Leg[]; places: Place[] }
+
+/** One city per stay location, in the colour of its first stay. */
+export function citiesFromStays(stays: Stay[]): City[] {
+  const cities: City[] = []
+  for (const s of stays) {
+    if (!cities.some(c => c.name === s.location_name)) {
+      cities.push({ id: crypto.randomUUID(), name: s.location_name, color: s.color })
+    }
+  }
+  return cities
+}
 
 // Sample itinerary so the app has something lovely to show before
 // Supabase is connected. Everything is editable / deletable.
@@ -68,7 +79,7 @@ export function seedData(): DB {
   ): Place => ({
     id: uid(), trip_id: tripId,
     stay_id: stayIdx === null ? null : stays[stayIdx].id,
-    date, start_time, end_time, name, category, emoji: '', map_url, notes,
+    date, start_time, end_time, name, city: '', category, emoji: '', map_url, notes,
     leftover: false,
   })
 
@@ -102,7 +113,7 @@ export function seedData(): DB {
   ): Place => ({
     id: uid(), trip_id: parisId, stay_id: parisStay.id,
     date: null, start_time: null, end_time: null,
-    name, category, emoji: '', map_url, notes, leftover,
+    name, city: '', category, emoji: '', map_url, notes, leftover,
   })
 
   const parisPlaces: Place[] = [
@@ -114,9 +125,11 @@ export function seedData(): DB {
     mkParisPlace('A day trip to Versailles', 'nature', '', 'Needs a whole day', true),
   ]
 
+  const allStays = [...stays, parisStay]
   return {
+    cities: citiesFromStays(allStays),
     trips: [trip, paris],
-    stays: [...stays, parisStay],
+    stays: allStays,
     legs: [
       ...legs,
       { id: uid(), trip_id: parisId, date: '2026-04-10', arrive_date: null, from_name: 'Home', to_name: 'Paris', mode: 'flight', notes: '' },

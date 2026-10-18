@@ -1,6 +1,6 @@
 import { supabase, cloudEnabled } from '../supabaseClient'
-import type { Leg, Place, Stay, Trip, TripData } from '../types'
-import { seedData, type DB } from './demo'
+import type { City, Leg, Place, Stay, Trip, TripData } from '../types'
+import { citiesFromStays, seedData, type DB } from './demo'
 
 export interface Store {
   mode: 'demo' | 'cloud'
@@ -8,8 +8,20 @@ export interface Store {
   offline: boolean
   listTrips(): Promise<Trip[]>
   loadTrip(tripId: string): Promise<TripData>
-  /** Every place flagged "next time", across all trips. */
+  /**
+   * Every place flagged "next time", across all trips. `city` is filled in
+   * from the place's stay when it has one.
+   */
   listLeftovers(): Promise<Place[]>
+  /** The shared city list, by name. */
+  listCities(): Promise<City[]>
+  /**
+   * Save a city. Renaming or recolouring one (`prev` = how it was) carries
+   * the change to every stay and place that uses it.
+   */
+  saveCity(c: City, prev?: City): Promise<void>
+  /** Off the list only — stays already in that city keep it. */
+  deleteCity(id: string): Promise<void>
   saveTrip(t: Trip): Promise<void>
   deleteTrip(id: string): Promise<void>
   saveStay(s: Stay): Promise<void>
@@ -32,7 +44,13 @@ function createDemoStore(): Store {
   const load = (): DB => {
     const raw = localStorage.getItem(DEMO_KEY)
     if (raw) {
-      try { return JSON.parse(raw) as DB } catch { /* re-seed below */ }
+      try {
+        const db = JSON.parse(raw) as DB
+        // Saved before the city list existed: start it from the stays.
+        db.cities ??= citiesFromStays(db.stays)
+        db.places = db.places.map(p => ({ ...p, city: p.city ?? '' }))
+        return db
+      } catch { /* re-seed below */ }
     }
     const db = seedData()
     localStorage.setItem(DEMO_KEY, JSON.stringify(db))
@@ -67,9 +85,23 @@ function createDemoStore(): Store {
         places: db.places.filter(p => p.trip_id === tripId),
       })
     },
-    listLeftovers: () => Promise.resolve(
-      load().places.filter(p => p.leftover).sort((a, b) => a.name.localeCompare(b.name)),
+    listLeftovers: () => {
+      const db = load()
+      return Promise.resolve(db.places
+        .filter(p => p.leftover)
+        .map(p => ({ ...p, city: db.stays.find(s => s.id === p.stay_id)?.location_name ?? p.city }))
+        .sort((a, b) => a.name.localeCompare(b.name)))
+    },
+    listCities: () => Promise.resolve(
+      [...load().cities].sort((a, b) => a.name.localeCompare(b.name)),
     ),
+    saveCity: (c, prev) => mutate(db => {
+      put(db.cities, c)
+      if (!prev) return
+      db.stays = db.stays.map(s => s.location_name === prev.name ? { ...s, location_name: c.name, color: c.color } : s)
+      db.places = db.places.map(p => p.city === prev.name ? { ...p, city: c.name } : p)
+    }),
+    deleteCity: (id) => mutate(db => { db.cities = db.cities.filter(c => c.id !== id) }),
     saveTrip: (t) => mutate(db => put(db.trips, t)),
     deleteTrip: (id) => mutate(db => {
       db.trips = db.trips.filter(t => t.id !== id)
@@ -148,16 +180,48 @@ function createCloudStore(): Store {
 
     async listLeftovers() {
       try {
-        const { data, error } = await sb.from('places').select('*').eq('leftover', true).order('name')
+        const { data, error } = await sb.from('places')
+          .select('*, stay:stays(location_name)').eq('leftover', true).order('name')
         if (error) throw error
+        type Row = Place & { stay: { location_name: string } | null }
+        const places = (data as Row[]).map(({ stay, ...p }) => ({ ...p, city: stay?.location_name ?? p.city }))
         store.offline = false
-        cachePut('leftovers', data)
-        return data as Place[]
+        cachePut('leftovers', places)
+        return places
       } catch (e) {
         const cached = cacheGet<Place[]>('leftovers')
         if (cached) { store.offline = true; return cached }
         throw e
       }
+    },
+
+    async listCities() {
+      try {
+        const { data, error } = await sb.from('cities').select('id, name, color').order('name')
+        if (error) throw error
+        store.offline = false
+        cachePut('cities', data)
+        return data as City[]
+      } catch (e) {
+        const cached = cacheGet<City[]>('cities')
+        if (cached) { store.offline = true; return cached }
+        throw e
+      }
+    },
+
+    async saveCity(c, prev) {
+      const { error } = await sb.from('cities').upsert(c)
+      if (error) throw error
+      if (!prev) return
+      const [stays, places] = await Promise.all([
+        sb.from('stays').update({ location_name: c.name, color: c.color }).eq('location_name', prev.name),
+        sb.from('places').update({ city: c.name }).eq('city', prev.name),
+      ])
+      for (const r of [stays, places]) if (r.error) throw r.error
+    },
+    async deleteCity(id) {
+      const { error } = await sb.from('cities').delete().eq('id', id)
+      if (error) throw error
     },
 
     async saveTrip(t) {

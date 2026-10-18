@@ -2,17 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createStore } from './data/store'
 import { supabase } from './supabaseClient'
 import {
-  EMPTY_TRIP_DATA,
-  type Leg, type Place, type Stay, type Trip, type TripData,
+  EMPTY_TRIP_DATA, STAY_COLORS,
+  type City, type Leg, type Place, type Stay, type Trip, type TripData,
 } from './types'
 import { daysBetween, fmtShort } from './lib/dates'
-import { Calendar } from './components/Calendar'
+import { Calendar, CityChips } from './components/Calendar'
 import { DayModal, Overview } from './components/DayPanel'
-import { LegForm, LoginForm, Modal, PlaceForm, StayForm, TripForm } from './components/Forms'
+import { CityForm, LegForm, LoginForm, Modal, PlaceForm, StayForm, TripForm } from './components/Forms'
 import { TripList } from './components/TripList'
 
 type ModalState =
   | { type: 'trip'; trip?: Trip }
+  | { type: 'city'; city?: City }
   | { type: 'stay'; stay?: Stay; defaultDate?: string }
   | { type: 'leg'; leg?: Leg; defaultDate?: string }
   | { type: 'place'; place?: Place; defaultStayId?: string | null; defaultDate?: string | null; defaultLeftover?: boolean }
@@ -31,6 +32,7 @@ export default function App() {
   const [tripId, setTripId] = useState<string | null>(null)
   const [data, setData] = useState<TripData>(EMPTY_TRIP_DATA)
   const [leftovers, setLeftovers] = useState<Place[]>([])
+  const [cities, setCities] = useState<City[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -72,20 +74,27 @@ export default function App() {
     try { setLeftovers(await store.listLeftovers()) } catch { setLeftovers([]) }
   }, [store])
 
+  // The shared city list stays pick from. Never fatal either: stays then
+  // just offer the cities they already use.
+  const refreshCities = useCallback(async () => {
+    try { setCities(await store.listCities()) } catch { setCities([]) }
+  }, [store])
+
   useEffect(() => { void refreshTrips() }, [refreshTrips])
   useEffect(() => { void refreshData() }, [refreshData])
   useEffect(() => { void refreshLeftovers() }, [refreshLeftovers])
+  useEffect(() => { void refreshCities() }, [refreshCities])
 
   // Pick up edits made on another device when returning to the tab.
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
-        void refreshTrips(); void refreshData(); void refreshLeftovers()
+        void refreshTrips(); void refreshData(); void refreshLeftovers(); void refreshCities()
       }
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
-  }, [refreshTrips, refreshData, refreshLeftovers])
+  }, [refreshTrips, refreshData, refreshLeftovers, refreshCities])
 
   // Auth (cloud mode only).
   useEffect(() => {
@@ -137,6 +146,7 @@ export default function App() {
       if (opts.trips) await refreshTrips()
       await refreshData()
       await refreshLeftovers()
+      await refreshCities()
       setModal(null)
     } catch (e) {
       alert('Could not save: ' + errMsg(e))
@@ -146,6 +156,10 @@ export default function App() {
   function deleteTrip(t: Trip) {
     if (!confirm(`Delete the whole trip “${t.name}”?\nThis removes all of its stays, travel days and places.`)) return
     void persist(() => store.deleteTrip(t.id), { trips: true })
+  }
+  function deleteCity(c: City) {
+    if (!confirm(`Remove ${c.name} from the city list?\nStays already in ${c.name} keep it.`)) return
+    void persist(() => store.deleteCity(c.id))
   }
   function deleteStay(s: Stay) {
     if (!confirm(`Remove the stay in ${s.location_name}? Its places become general ideas.`)) return
@@ -182,7 +196,11 @@ export default function App() {
       ...p,
       id: uid(),
       trip_id: trip.id,
-      stay_id: null, // the old trip's stays mean nothing here
+      // The old trip's stays mean nothing here — join this trip's first
+      // stay in the same city instead.
+      stay_id: [...data.stays]
+        .sort((a, b) => a.start_date.localeCompare(b.start_date))
+        .find(s => s.location_name === p.city)?.id ?? null,
       date: null,
       start_time: null,
       end_time: null,
@@ -243,15 +261,35 @@ export default function App() {
             />
           </Modal>
         )
+      case 'city':
+        return (
+          <Modal title={modal.city ? '✏️ Edit city' : '🏙️ New city'} onClose={() => setModal(null)}>
+            <CityForm
+              initial={modal.city}
+              cities={cities}
+              onSave={v => {
+                const c: City = { id: modal.city?.id ?? uid(), ...v }
+                void persist(() => store.saveCity(c, modal.city))
+              }}
+              onDelete={modal.city ? () => deleteCity(modal.city!) : undefined}
+            />
+          </Modal>
+        )
       case 'stay':
         return (
           <Modal title={modal.stay ? '✏️ Edit stay' : '🏡 New stay'} onClose={() => setModal(null)}>
             <StayForm
               initial={modal.stay}
               defaultDate={modal.defaultDate}
+              cities={cities}
               onSave={v => {
                 const s: Stay = { id: modal.stay?.id ?? uid(), trip_id: trip!.id, ...v }
-                void persist(() => store.saveStay(s))
+                // A city typed in here joins the shared list too.
+                const isNew = !cities.some(c => c.name === s.location_name)
+                void persist(async () => {
+                  if (isNew) await store.saveCity({ id: uid(), name: s.location_name, color: s.color })
+                  await store.saveStay(s)
+                })
               }}
               onDelete={modal.stay ? () => deleteStay(modal.stay!) : undefined}
             />
@@ -263,6 +301,7 @@ export default function App() {
             <LegForm
               initial={modal.leg}
               defaultDate={modal.defaultDate}
+              cities={cities}
               onSave={v => {
                 const l: Leg = { id: modal.leg?.id ?? uid(), trip_id: trip!.id, ...v }
                 void persist(() => store.saveLeg(l))
@@ -277,6 +316,7 @@ export default function App() {
             <PlaceForm
               initial={modal.place}
               stays={data.stays}
+              cities={cities}
               defaultStayId={modal.defaultStayId}
               defaultDate={modal.defaultDate}
               defaultLeftover={modal.defaultLeftover}
@@ -298,6 +338,7 @@ export default function App() {
   }
 
   const totalDays = trip ? daysBetween(trip.start_date, trip.end_date) + 1 : 0
+  const tripCities = new Set(data.stays.map(s => s.location_name))
 
   return (
     <div className="app">
@@ -313,6 +354,9 @@ export default function App() {
             ) : trips && trips.length > 0 ? (
               <p className="sub">{trips.length} {trips.length === 1 ? 'plan' : 'plans'}</p>
             ) : null}
+            {trip && (
+              <CityChips stays={data.stays} selectedDate={selectedDate} onSelect={setSelectedDate} />
+            )}
           </div>
         </div>
         <div className="actions">
@@ -357,7 +401,8 @@ export default function App() {
             trip={trip}
             data={data}
             trips={trips ?? []}
-            pastLeftovers={leftovers.filter(p => p.trip_id !== trip.id)}
+            // Only ideas for cities this trip actually goes to.
+            pastLeftovers={leftovers.filter(p => p.trip_id !== trip.id && tripCities.has(p.city))}
             editMode={editMode}
             onSelectDate={setSelectedDate}
             onEditStay={(stay, defaultDate) => setModal({ type: 'stay', stay, defaultDate })}
@@ -377,8 +422,10 @@ export default function App() {
       ) : (
         <TripList
           trips={trips}
+          cities={cities}
           editMode={editMode}
           onOpen={openTrip}
+          onEditCity={city => setModal({ type: 'city', city })}
           onEdit={t => setModal({ type: 'trip', trip: t })}
           onNew={() => setModal({ type: 'trip' })}
           onSignIn={onEditClick}

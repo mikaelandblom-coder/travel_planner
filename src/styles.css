@@ -366,6 +366,27 @@ textarea { resize: vertical; }
 
 .chip:hover { transform: translateY(-1px) scale(1.03); }
 
+.chip.static { cursor: default; }
+.chip.static:hover { transform: none; }
+
+.chip-new {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--line);
+  color: var(--muted);
+}
+
+.header .legend {
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.header .chip { padding: 4px 11px; }
+
+.cities {
+  margin-top: 18px;
+  padding: 16px 18px 18px;
+}
+
 .chip-count {
   font-size: 0.72em;
   opacity: 0.65;

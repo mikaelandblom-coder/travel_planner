@@ -121,7 +121,7 @@ export function Overview({
       {editMode && pastLeftovers.length > 0 && (
         <>
           <h3 className="panel-sub">💭 Saved from earlier trips</h3>
-          <p className="hint">Tap ＋ to bring one along on this trip.</p>
+          <p className="hint">Ideas from earlier trips to the cities on this one — tap ＋ to bring one along.</p>
           <ul className="places">
             {pastLeftovers.map(p => {
               const from = trips.find(t => t.id === p.trip_id)

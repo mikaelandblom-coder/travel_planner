@@ -12,10 +12,18 @@ create table trips (
   created_at timestamptz not null default now()
 );
 
+-- The shared city list stays pick from (managed on the start page).
+create table cities (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  color text not null default '#FFD9C7', -- used by every stay in this city
+  created_at timestamptz not null default now()
+);
+
 create table stays (
   id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references trips (id) on delete cascade,
-  location_name text not null,
+  location_name text not null,  -- a city's name
   start_date date not null,
   end_date date not null,
   color text not null default '#FFD9C7',
@@ -44,6 +52,7 @@ create table places (
   start_time time,             -- optional 'when does it start'
   end_time time,               -- optional 'when does it end'
   name text not null,
+  city text not null default '',  -- city of a place without a stay ('' = anywhere)
   category text not null default 'other',
   emoji text not null default '',  -- custom emoji; '' = use the category's
 
@@ -64,6 +73,7 @@ create table editors (
 
 -- ---------- row level security ----------
 
+alter table cities enable row level security;
 alter table trips enable row level security;
 alter table stays enable row level security;
 alter table legs enable row level security;
@@ -85,12 +95,15 @@ as $$
 $$;
 
 -- Everyone (including anonymous visitors) can read the itinerary.
+create policy "public read cities" on cities for select using (true);
 create policy "public read trips" on trips for select using (true);
 create policy "public read stays" on stays for select using (true);
 create policy "public read legs" on legs for select using (true);
 create policy "public read places" on places for select using (true);
 
 -- Only editors can write.
+create policy "editors write cities" on cities
+  for all to authenticated using (is_editor()) with check (is_editor());
 create policy "editors write trips" on trips
   for all to authenticated using (is_editor()) with check (is_editor());
 create policy "editors write stays" on stays

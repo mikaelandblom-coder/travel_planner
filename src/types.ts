@@ -6,10 +6,17 @@ export type Trip = {
   end_date: string // inclusive
 }
 
+/** A city on the shared list (start page) that stays pick from. */
+export type City = {
+  id: string
+  name: string
+  color: string // used by every stay in this city
+}
+
 export type Stay = {
   id: string
   trip_id: string
-  location_name: string
+  location_name: string // a City's name
   start_date: string // arrival day
   end_date: string // departure day (inclusive, may overlap next stay's arrival)
   color: string
@@ -38,6 +45,8 @@ export type Place = {
   start_time: string | null // 'HH:MM', optional
   end_time: string | null // 'HH:MM', optional
   name: string
+  /** City of a place without a stay ('' = anywhere); a stay's city wins. */
+  city: string
   category: string
   emoji: string // custom emoji; '' = use the category's emoji
   map_url: string

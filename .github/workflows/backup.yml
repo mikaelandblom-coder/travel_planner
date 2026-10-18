@@ -27,7 +27,7 @@ jobs:
             exit 0
           fi
           mkdir -p backups
-          for table in trips stays legs places; do
+          for table in cities trips stays legs places; do
             curl --fail --silent --show-error \
               "$SUPABASE_URL/rest/v1/$table?select=*&order=id" \
               -H "apikey: $SUPABASE_KEY" | jq '.' > "backups/$table.json"

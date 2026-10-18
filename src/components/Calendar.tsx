@@ -12,16 +12,48 @@ type Props = {
   onSelect: (iso: string) => void
 }
 
-export function Calendar({ trip, stays, legs, places, selectedDate, onSelect }: Props) {
+/**
+ * The trip's cities in the order we get to them — one chip per city, even
+ * with several visits. Shown in the header as the trip's summary.
+ */
+export function CityChips({ stays, selectedDate, onSelect }: {
+  stays: Stay[]
+  selectedDate: string | null
+  onSelect: (iso: string) => void
+}) {
   const sorted = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
-
-  // One legend chip per location, even when it has several visits.
   const chipGroups: { name: string; color: string; visits: Stay[] }[] = []
   for (const s of sorted) {
     const g = chipGroups.find(x => x.name === s.location_name)
     if (g) g.visits.push(s)
     else chipGroups.push({ name: s.location_name, color: s.color, visits: [s] })
   }
+  if (chipGroups.length === 0) return null
+
+  return (
+    <div className="legend">
+      {chipGroups.map(g => (
+        <button
+          key={g.name}
+          className="chip"
+          style={{ background: g.color }}
+          title={`${g.name}: ` + g.visits.map(v => `${v.start_date} → ${v.end_date}`).join(', ')}
+          onClick={() => {
+            // Repeated clicks cycle through this city's visits.
+            const i = g.visits.findIndex(v => v.start_date === selectedDate)
+            onSelect(g.visits[(i + 1) % g.visits.length].start_date)
+          }}
+        >
+          {g.name}
+          {g.visits.length > 1 && <span className="chip-count">×{g.visits.length}</span>}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+export function Calendar({ trip, stays, legs, places, selectedDate, onSelect }: Props) {
+  const sorted = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
   const all = [
     trip.start_date, trip.end_date,
     ...stays.flatMap(s => [s.start_date, s.end_date]),
@@ -34,26 +66,6 @@ export function Calendar({ trip, stays, legs, places, selectedDate, onSelect }: 
 
   return (
     <section className="calendar">
-      {chipGroups.length > 0 && (
-        <div className="legend">
-          {chipGroups.map(g => (
-            <button
-              key={g.name}
-              className="chip"
-              style={{ background: g.color }}
-              title={`${g.name}: ` + g.visits.map(v => `${v.start_date} → ${v.end_date}`).join(', ')}
-              onClick={() => {
-                // Repeated clicks cycle through this location's visits.
-                const i = g.visits.findIndex(v => v.start_date === selectedDate)
-                onSelect(g.visits[(i + 1) % g.visits.length].start_date)
-              }}
-            >
-              {g.name}
-              {g.visits.length > 1 && <span className="chip-count">×{g.visits.length}</span>}
-            </button>
-          ))}
-        </div>
-      )}
       {months.map(({ year, month }) => (
         <MonthGrid
           key={`${year}-${month}`}

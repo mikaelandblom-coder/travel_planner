@@ -35,3 +35,10 @@ insert into places (trip_id, stay_id, name, category, map_url, notes) values
   ('a0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000005', 'teamLab Planets',         'sight',  'https://maps.google.com/?q=teamLab+Planets+Tokyo', 'Book ahead!'),
   ('a0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000007', 'Fushimi Inari',           'sight',  'https://maps.google.com/?q=Fushimi+Inari+Taisha', 'Go early morning'),
   ('a0000000-0000-4000-8000-000000000001', null,                                    'Try a konbini egg sando', 'food',   '', 'Any 7-Eleven 🥪');
+
+-- The city list, from the stays above.
+insert into cities (name, color)
+select distinct on (location_name) location_name, color
+from stays
+order by location_name, start_date
+on conflict (name) do nothing;

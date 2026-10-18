@@ -1,4 +1,4 @@
-import type { Trip } from '../types'
+import type { City, Trip } from '../types'
 import { daysBetween, fmtShort, todayISO } from '../lib/dates'
 
 /** Upcoming and ongoing trips first (soonest first), finished ones last (most recent first). */
@@ -26,10 +26,13 @@ function status(trip: Trip, today: string): { text: string; tone: 'soon' | 'now'
   return { text: '📮 finished', tone: 'past' }
 }
 
-export function TripList({ trips, editMode, onOpen, onEdit, onNew, onSignIn }: {
+export function TripList({ trips, cities, editMode, onOpen, onEditCity, onEdit, onNew, onSignIn }: {
   trips: Trip[]
+  cities: City[]
   editMode: boolean
   onOpen: (trip: Trip) => void
+  /** Open the city form: a city to edit, or none for a new one. */
+  onEditCity: (city?: City) => void
   onEdit: (trip: Trip) => void
   onNew: () => void
   onSignIn: () => void
@@ -86,6 +89,36 @@ export function TripList({ trips, editMode, onOpen, onEdit, onNew, onSignIn }: {
           </button>
         )}
       </div>
+      <CityList cities={cities} editMode={editMode} onEdit={onEditCity} />
     </section>
+  )
+}
+
+/** The cities stays pick from — shared by every trip. */
+function CityList({ cities, editMode, onEdit }: {
+  cities: City[]
+  editMode: boolean
+  onEdit: (city?: City) => void
+}) {
+  if (cities.length === 0 && !editMode) return null
+  return (
+    <div className="cities card">
+      <h2 className="panel-title">🏙️ Cities</h2>
+      <p className="hint">
+        {editMode
+          ? 'Stays pick from this list. Tap a city to rename or recolour it.'
+          : 'Every city in our plans.'}
+      </p>
+      <div className="legend">
+        {cities.map(c => editMode ? (
+          <button key={c.id} className="chip" style={{ background: c.color }} onClick={() => onEdit(c)}>
+            {c.name}
+          </button>
+        ) : (
+          <span key={c.id} className="chip static" style={{ background: c.color }}>{c.name}</span>
+        ))}
+        {editMode && <button className="chip chip-new" onClick={() => onEdit()}>＋ City</button>}
+      </div>
+    </div>
   )
 }
