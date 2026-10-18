@@ -475,7 +475,7 @@ textarea { resize: vertical; }
   border-radius: 12px;
   background: #faf6f0;
   min-height: 88px;
-  padding: 5px 6px;
+  padding: 0;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -491,6 +491,22 @@ textarea { resize: vertical; }
   box-shadow: 0 3px 8px rgba(90, 70, 50, 0.15);
   z-index: 1;
 }
+
+/* A stretch of the day (a city, or travel between two), stacked morning to
+   evening. Heights follow the time spent (flex-grow, set inline) but never
+   squeeze the lines inside. */
+.band {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-basis: 0;
+  flex-shrink: 0;
+  align-self: stretch;
+  padding: 2px 6px;
+}
+
+.band:first-child { padding-top: 5px; }
+.band:last-of-type { padding-bottom: 5px; }
 
 .day.pad {
   background: transparent;
@@ -513,6 +529,7 @@ textarea { resize: vertical; }
   font-size: 0.68rem;
   font-weight: 900;
   line-height: 1;
+  font-style: normal;
   color: #4f9a6a;
   opacity: 0.8;
 }
@@ -578,7 +595,10 @@ textarea { resize: vertical; }
 }
 
 @media (max-width: 600px) {
-  .day { min-height: 72px; padding: 4px 4px; }
+  .day { min-height: 72px; }
+  .band { padding: 2px 4px; }
+  .band:first-child { padding-top: 4px; }
+  .band:last-of-type { padding-bottom: 4px; }
   .day-planned { top: 4px; right: 4px; }
   .day-act { font-size: 0.56rem; padding: 1px 3px; }
 }

@@ -9,7 +9,8 @@ type Props = {
   editMode: boolean
   onSelectDate: (iso: string | null) => void
   onEditStay: (stay?: Stay, defaultDate?: string) => void
-  onEditLeg: (leg?: Leg, defaultDate?: string) => void
+  /** defaultFrom / dayTrip: start the form as a day trip from that city. */
+  onEditLeg: (leg?: Leg, defaultDate?: string, defaultFrom?: string, dayTrip?: boolean) => void
   onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null, defaultLeftover?: boolean) => void
   onAssignStay: (stay: Stay, date: string) => void
   onDeleteStay: (s: Stay) => void
@@ -299,6 +300,13 @@ function DayView(props: DayProps) {
             onClick={() => props.onEditPlace(undefined, dayStays[0]?.id ?? null, date)}
           >＋ Visit this day</button>
           <button className="btn small" onClick={() => props.onEditLeg(undefined, date)}>＋ Travel this day</button>
+          {dayStays.length > 0 && (
+            <button
+              className="btn small"
+              title="Go somewhere and come back the same day"
+              onClick={() => props.onEditLeg(undefined, date, dayStays[0].location_name, true)}
+            >＋ Day trip</button>
+          )}
         </div>
       )}
       {editMode && data.stays.length === 0 && (

@@ -10,7 +10,9 @@ A cute, minimal travel planner for two — first stop: **Vietnam & Japan, Nov–
   and each trip's header sums up its cities.
 - **City bands**: a day in more than one city is split top-to-bottom, each
   band as tall as the time spent there (from the travel's departure / arrival
-  times, if filled in).
+  times, if filled in), and each activity / travel line sits in the band of
+  the time it happens. Day trips count too: ＋ Day trip (or ↩️ Back the same
+  day on a travel line) adds the way there and back.
 - **To-do list** per trip for things to tick off (book tickets, buy a SIM…);
   a backup idea that's really a chore moves there with ☑️.
 - **Planned days**: mark a day as fully planned from its popup — the calendar
