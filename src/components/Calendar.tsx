@@ -269,8 +269,8 @@ function MonthGrid({
 
   // Like a spreadsheet: dragging a column's right edge widens just that
   // column and the whole planner grows with it — the other columns keep
-  // their size. Once the planner fills the window it can't grow further,
-  // and the columns share what's there.
+  // their size. The planner may grow past the window; the page then
+  // scrolls sideways.
   function startDrag(e: PointerEvent<HTMLSpanElement>, col: number) {
     const grid = headRef.current
     const app = grid?.closest<HTMLElement>('.app')

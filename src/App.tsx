@@ -208,6 +208,13 @@ export default function App() {
     })
   }
 
+  /** Make the planner exactly as wide as this window (columns keep their proportions). */
+  function fitToScreen() {
+    if (!trip) return
+    const page_width = document.documentElement.clientWidth
+    void persist(() => store.saveTrip({ ...trip, page_width }), { trips: true })
+  }
+
   /** Tick a day as fully planned (or un-tick it). */
   function togglePlanned(date: string) {
     if (!trip) return
@@ -397,7 +404,11 @@ export default function App() {
   const tripCities = new Set(data.stays.map(s => s.location_name))
 
   return (
-    <div className="app" style={pageWidth ? { maxWidth: pageWidth } : undefined}>
+    <div
+      className={'app' + (pageWidth ? ' wide' : '')}
+      // An exact width, even wider than the window (the page scrolls sideways).
+      style={pageWidth ? { width: pageWidth, maxWidth: 'none' } : undefined}
+    >
       <header className="header card">
         <div className="brand">
           <span className="brand-emoji">{trip?.emoji || '🧳'}</span>
@@ -421,6 +432,11 @@ export default function App() {
           )}
           {editMode && trip && (
             <button className="btn ghost" onClick={() => setModal({ type: 'trip', trip })}>✏️ Trip</button>
+          )}
+          {editMode && trip && (
+            <button className="btn ghost" title="Make the planner as wide as this window" onClick={fitToScreen}>
+              ↔️ Fit screen
+            </button>
           )}
           <button className={'btn' + (editMode ? ' primary' : '')} onClick={onEditClick}>
             {editMode ? '✓ Done' : '🖊️ Edit'}

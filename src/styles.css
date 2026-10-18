@@ -45,6 +45,15 @@ body::before {
   padding: 20px 16px 40px;
 }
 
+/* A planner set wider than the window scrolls sideways — but only the
+   calendar: the header, banners and overview stay pinned at window width. */
+.app.wide > :not(.layout):not(.overlay),
+.app.wide .panel {
+  position: sticky;
+  left: 16px;
+  max-width: calc(100vw - 32px);
+}
+
 .card {
   background: var(--card);
   border-radius: var(--radius);
