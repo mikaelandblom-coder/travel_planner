@@ -50,7 +50,7 @@
     "from_name": "Saigon",
     "to_name": "Osaka",
     "mode": "flight",
-    "notes": "Flyget går 00:05 den 18e men vi behöver vara på flygplatsen den 17e. Landar 07:00",
+    "notes": "Flyget går 00:05 den 18e men vi behöver vara på flygplatsen den 17e. Landar 07:00. Ta JR Haruka till Osaka Station ca 50m 1800 yen/p",
     "created_at": "2026-07-12T08:18:04.742133+00:00",
     "arrive_date": "2026-11-18"
   },
@@ -72,7 +72,7 @@
     "from_name": "Kyoto",
     "to_name": "Tokyo",
     "mode": "train",
-    "notes": "",
+    "notes": "Taxi till Kyoto Station. Ta tåg Nozomi Green Car till Tokyo Station. Tar ca 2h15m ca 30-40k yen för 2p. Boka säten A+B. Ta tåg JR Yamanote Line till Takadanobaba Station ca 25m. Sen gå 3m till hottellet",
     "created_at": "2026-07-12T08:21:49.603524+00:00",
     "arrive_date": null
   },
@@ -83,7 +83,7 @@
     "from_name": "Osaka",
     "to_name": "Kyoto",
     "mode": "train",
-    "notes": "",
+    "notes": "JR Special Rapid till Kyoto Station ca 30m 580 yen/p ca 9m med taxi till hotellet",
     "created_at": "2026-07-12T08:19:52.100576+00:00",
     "arrive_date": null
   },
@@ -107,6 +107,17 @@
     "mode": "flight",
     "notes": "",
     "created_at": "2026-07-12T08:22:48.107414+00:00",
+    "arrive_date": null
+  },
+  {
+    "id": "c9a1c907-30af-4773-a857-a35a2d5449c2",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "date": "2026-11-20",
+    "from_name": "Osaka",
+    "to_name": "Nara",
+    "mode": "train",
+    "notes": "Platform 1 Osaka Loop Line\nTåget heter Yamatoji Rapid Service mot Nara eller Kamo\nKliv inte på tåget Local Loop\n50 minuter 840 yen\nGår att betala med ICOCA & SUICA\nKliver av vid station JR Nara Station\nTar ca 20m att gå till parken från stationen",
+    "created_at": "2026-10-17T08:42:28.144958+00:00",
     "arrive_date": null
   },
   {
