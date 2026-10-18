@@ -1,5 +1,5 @@
 import { supabase, cloudEnabled } from '../supabaseClient'
-import type { City, Leg, Place, Stay, Trip, TripData } from '../types'
+import type { City, Leg, Place, Stay, Todo, Trip, TripData } from '../types'
 import { citiesFromStays, seedData, type DB } from './demo'
 
 export interface Store {
@@ -30,7 +30,15 @@ export interface Store {
   deleteLeg(id: string): Promise<void>
   savePlace(p: Place): Promise<void>
   deletePlace(id: string): Promise<void>
+  saveTodo(t: Todo): Promise<void>
+  deleteTodo(id: string): Promise<void>
 }
+
+/** Rows saved before a column existed (or cached then) get its default. */
+const withTripDefaults = (t: Trip): Trip => ({
+  ...t, planned_days: t.planned_days ?? [], col_widths: t.col_widths ?? {}, page_width: t.page_width ?? null,
+})
+const withLegDefaults = (l: Leg): Leg => ({ ...l, depart_time: l.depart_time ?? null, arrive_time: l.arrive_time ?? null })
 
 export function createStore(): Store {
   return cloudEnabled ? createCloudStore() : createDemoStore()
@@ -49,6 +57,9 @@ function createDemoStore(): Store {
         // Saved before the city list existed: start it from the stays.
         db.cities ??= citiesFromStays(db.stays)
         db.places = db.places.map(p => ({ ...p, city: p.city ?? '' }))
+        db.trips = db.trips.map(withTripDefaults)
+        db.legs = db.legs.map(withLegDefaults)
+        db.todos ??= []
         return db
       } catch { /* re-seed below */ }
     }
@@ -83,6 +94,7 @@ function createDemoStore(): Store {
         stays: db.stays.filter(s => s.trip_id === tripId),
         legs: db.legs.filter(l => l.trip_id === tripId),
         places: db.places.filter(p => p.trip_id === tripId),
+        todos: db.todos.filter(t => t.trip_id === tripId),
       })
     },
     listLeftovers: () => {
@@ -108,6 +120,7 @@ function createDemoStore(): Store {
       db.stays = db.stays.filter(s => s.trip_id !== id)
       db.legs = db.legs.filter(l => l.trip_id !== id)
       db.places = db.places.filter(p => p.trip_id !== id)
+      db.todos = db.todos.filter(t => t.trip_id !== id)
     }),
     saveStay: (s) => mutate(db => put(db.stays, s)),
     deleteStay: (id) => mutate(db => {
@@ -118,6 +131,8 @@ function createDemoStore(): Store {
     deleteLeg: (id) => mutate(db => { db.legs = db.legs.filter(l => l.id !== id) }),
     savePlace: (p) => mutate(db => put(db.places, p)),
     deletePlace: (id) => mutate(db => { db.places = db.places.filter(p => p.id !== id) }),
+    saveTodo: (t) => mutate(db => put(db.todos, t)),
+    deleteTodo: (id) => mutate(db => { db.todos = db.todos.filter(t => t.id !== id) }),
   }
 }
 
@@ -147,33 +162,39 @@ function createCloudStore(): Store {
         if (error) throw error
         store.offline = false
         cachePut('trips', data)
-        return data as Trip[]
+        return (data as Trip[]).map(withTripDefaults)
       } catch (e) {
         const cached = cacheGet<Trip[]>('trips')
-        if (cached) { store.offline = true; return cached }
+        if (cached) { store.offline = true; return cached.map(withTripDefaults) }
         throw e
       }
     },
 
     async loadTrip(tripId) {
       try {
-        const [stays, legs, places] = await Promise.all([
+        const [stays, legs, places, todos] = await Promise.all([
           sb.from('stays').select('*').eq('trip_id', tripId).order('start_date'),
           sb.from('legs').select('*').eq('trip_id', tripId).order('date'),
           sb.from('places').select('*').eq('trip_id', tripId).order('name'),
+          sb.from('todos').select('*').eq('trip_id', tripId).order('created_at'),
         ])
         for (const r of [stays, legs, places]) if (r.error) throw r.error
         const data: TripData = {
           stays: stays.data as Stay[],
-          legs: legs.data as Leg[],
+          legs: (legs.data as Leg[]).map(withLegDefaults),
           places: places.data as Place[],
+          // Not fatal: before the to-do migration has run there's no table.
+          todos: todos.error ? [] : todos.data as Todo[],
         }
         store.offline = false
         cachePut('trip:' + tripId, data)
         return data
       } catch (e) {
         const cached = cacheGet<TripData>('trip:' + tripId)
-        if (cached) { store.offline = true; return cached }
+        if (cached) {
+          store.offline = true
+          return { ...cached, legs: cached.legs.map(withLegDefaults), todos: cached.todos ?? [] }
+        }
         throw e
       }
     },
@@ -254,6 +275,14 @@ function createCloudStore(): Store {
     },
     async deletePlace(id) {
       const { error } = await sb.from('places').delete().eq('id', id)
+      if (error) throw error
+    },
+    async saveTodo(t) {
+      const { error } = await sb.from('todos').upsert(t)
+      if (error) throw error
+    },
+    async deleteTodo(id) {
+      const { error } = await sb.from('todos').delete().eq('id', id)
       if (error) throw error
     },
   }

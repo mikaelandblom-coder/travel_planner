@@ -1,4 +1,5 @@
-import type { Leg, Place, Stay, Trip, TripData } from '../types'
+import { useState } from 'react'
+import type { Leg, Place, Stay, Todo, Trip, TripData } from '../types'
 import { modeEmoji, placeEmoji, timeKey, timeRange } from '../types'
 import { addDays, daysBetween, fmtLong, fmtShort } from '../lib/dates'
 
@@ -25,13 +26,18 @@ type OverviewProps = Props & {
   pastLeftovers: Place[]
   /** Copy one of those into this trip (and tick it off the old trip's list). */
   onCarryOver: (p: Place) => void
+  onAddTodo: (text: string) => void
+  onSaveTodo: (t: Todo) => void
+  onDeleteTodo: (t: Todo) => void
+  /** Turn a backup idea into a to-do (it leaves the backup list). */
+  onPlaceToTodo: (p: Place) => void
 }
 
-/** Trip summary, backup list and the "next time" lists, shown below the calendar. */
+/** Trip summary, to-dos, backup list and the "next time" lists, shown below the calendar. */
 export function Overview({
   trip, data, trips, pastLeftovers, editMode, onSelectDate,
   onEditStay, onEditLeg, onEditPlace, onDeleteStay, onDeletePlace,
-  onToggleLeftover, onCarryOver,
+  onToggleLeftover, onCarryOver, onAddTodo, onSaveTodo, onDeleteTodo, onPlaceToTodo,
 }: OverviewProps) {
   const stays = [...data.stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
   // The backup list: everything not yet allocated to a day. General ideas
@@ -82,12 +88,20 @@ export function Overview({
         {stays.length === 0 && <p className="hint">No stays yet{editMode ? ' — add your first one below!' : '.'}</p>}
       </div>
 
+      <TodoList
+        todos={data.todos}
+        editMode={editMode}
+        onAdd={onAddTodo}
+        onSave={onSaveTodo}
+        onDelete={onDeleteTodo}
+      />
+
       {(backup.length > 0 || editMode) && (
         <>
           <h3 className="panel-sub">📌 Backup list</h3>
           <p className="hint">
             Restaurants & ideas without a day yet
-            {editMode ? ' — edit one to give it a day, or link a Google Maps saved list (📑).' : '.'}
+            {editMode ? ' — edit one to give it a day, link a Google Maps saved list (📑), or tap ☑️ to make it a to-do.' : '.'}
           </p>
         </>
       )}
@@ -98,6 +112,7 @@ export function Overview({
         onEditPlace={onEditPlace}
         onDeletePlace={onDeletePlace}
         onToggleLeftover={onToggleLeftover}
+        onToTodo={onPlaceToTodo}
       />
 
       {(leftovers.length > 0 || editMode) && (
@@ -162,8 +177,14 @@ export function Overview({
   )
 }
 
+type DayProps = Props & {
+  date: string
+  /** Mark the day's planning as done / not done. */
+  onTogglePlanned: (date: string) => void
+}
+
 /** A day's details in a popup over the calendar. */
-export function DayModal(props: Props & { date: string }) {
+export function DayModal(props: DayProps) {
   return (
     <div className="overlay" onMouseDown={() => props.onSelectDate(null)}>
       <div className="modal day-modal card" onMouseDown={e => e.stopPropagation()}>
@@ -173,7 +194,7 @@ export function DayModal(props: Props & { date: string }) {
   )
 }
 
-function DayView(props: Props & { date: string }) {
+function DayView(props: DayProps) {
   const { trip, data, date, editMode } = props
   const dayStays = data.stays
     .filter(s => s.start_date <= date && date <= s.end_date)
@@ -184,13 +205,19 @@ function DayView(props: Props & { date: string }) {
     .sort((a, b) => timeKey(a).localeCompare(timeKey(b)))
   const dayN = daysBetween(trip.start_date, date) + 1
   const total = daysBetween(trip.start_date, trip.end_date) + 1
+  const planned = trip.planned_days.includes(date)
 
   return (
     <>
       <div className="panel-head">
         <div>
           <h2 className="panel-title">{fmtLong(date)}</h2>
-          {dayN >= 1 && dayN <= total && <p className="hint">Day {dayN} of {total}</p>}
+          {((dayN >= 1 && dayN <= total) || planned) && (
+            <p className="hint">
+              {dayN >= 1 && dayN <= total && `Day ${dayN} of ${total}`}
+              {planned && <span className="planned-tag">✓ planned</span>}
+            </p>
+          )}
         </div>
         <span className="day-nav">
           <button className="icon-btn" title="Previous day" onClick={() => props.onSelectDate(addDays(date, -1))}>‹</button>
@@ -208,6 +235,7 @@ function DayView(props: Props & { date: string }) {
             <strong>{l.to_name}</strong>
             {editMode && <RowActions onEdit={() => props.onEditLeg(l)} onDelete={() => props.onDeleteLeg(l)} />}
           </div>
+          {legTimes(l) && <p className="row-sub">🕐 {legTimes(l)}</p>}
           {l.arrive_date && l.arrive_date !== l.date && (
             <p className="row-sub">
               Departs {fmtShort(l.date)} · arrives {fmtShort(l.arrive_date)} (+{daysBetween(l.date, l.arrive_date)}{' '}
@@ -260,6 +288,11 @@ function DayView(props: Props & { date: string }) {
 
       {editMode && (
         <div className="btn-row">
+          <button
+            className={'btn small' + (planned ? ' planned-on' : '')}
+            title={planned ? 'Planning for this day is done — tap to reopen it' : 'Mark this day as fully planned'}
+            onClick={() => props.onTogglePlanned(date)}
+          >{planned ? '✓ Planned' : '☐ Mark planned'}</button>
           <StayPicker stays={data.stays} date={date} onAssign={props.onAssignStay} />
           <button
             className="btn small"
@@ -309,13 +342,87 @@ function StayPicker({ stays, date, onAssign }: {
   )
 }
 
-function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace, onToggleLeftover }: {
+/** '09:10 → 11:30' / 'departs 09:10' / 'arrives 11:30'; '' when no times. */
+function legTimes(l: Leg): string {
+  const dep = l.depart_time?.slice(0, 5)
+  const arr = l.arrive_time?.slice(0, 5)
+  if (dep && arr) return `${dep} → ${arr}`
+  if (dep) return `departs ${dep}`
+  if (arr) return `arrives ${arr}`
+  return ''
+}
+
+/** Things to tick off for the trip. Ticking needs edit mode, like any change. */
+function TodoList({ todos, editMode, onAdd, onSave, onDelete }: {
+  todos: Todo[]
+  editMode: boolean
+  onAdd: (text: string) => void
+  onSave: (t: Todo) => void
+  onDelete: (t: Todo) => void
+}) {
+  const [text, setText] = useState('')
+  if (todos.length === 0 && !editMode) return null
+  // Open ones first; done ones sink to the bottom (each in the order added).
+  const sorted = [...todos.filter(t => !t.done), ...todos.filter(t => t.done)]
+  const open = todos.filter(t => !t.done).length
+
+  return (
+    <>
+      <h3 className="panel-sub">☑️ To-do{todos.length > 0 && ` · ${todos.length - open}/${todos.length}`}</h3>
+      {editMode && todos.length === 0 && <p className="hint">Things to tick off — book tickets, buy a SIM…</p>}
+      <ul className="places">
+        {sorted.map(t => (
+          <li key={t.id} className={'todo' + (t.done ? ' done' : '')}>
+            <input
+              type="checkbox"
+              checked={t.done}
+              disabled={!editMode}
+              title={editMode ? undefined : 'Switch to edit mode to tick things off'}
+              onChange={() => onSave({ ...t, done: !t.done })}
+            />
+            <span className="row-main">
+              <span className="row-title">{t.text}</span>
+              {t.notes && <span className="row-sub">{t.notes}</span>}
+            </span>
+            {editMode && (
+              <RowActions
+                onEdit={() => {
+                  const next = prompt('To-do', t.text)?.trim()
+                  if (next && next !== t.text) onSave({ ...t, text: next })
+                }}
+                onDelete={() => onDelete(t)}
+              />
+            )}
+          </li>
+        ))}
+      </ul>
+      {editMode && (
+        <form
+          className="todo-add"
+          onSubmit={e => {
+            e.preventDefault()
+            if (!text.trim()) return
+            onAdd(text.trim())
+            setText('')
+          }}
+        >
+          <input value={text} onChange={e => setText(e.target.value)} placeholder="Add a to-do…" />
+          <button type="submit" className="btn small">＋</button>
+        </form>
+      )}
+    </>
+  )
+}
+
+function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace, onToggleLeftover, onToTodo }: {
   places: Place[]
   stays?: Stay[] // when given, rows show which stay each place belongs to
   editMode: boolean
   onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null) => void
   onDeletePlace: (p: Place) => void
   onToggleLeftover: (p: Place) => void
+  /** When given, edit mode offers turning a place into a to-do. */
+  onToTodo?: (p: Place) => void
 }) {
   if (places.length === 0) return null
   return (
@@ -349,6 +456,13 @@ function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace, onTogg
                   : `Didn't manage “${p.name}” — save it for next time`}
                 onClick={() => onToggleLeftover(p)}
               >{p.leftover ? '↩️' : '🌱'}</button>
+            )}
+            {editMode && onToTodo && (
+              <button
+                className="icon-btn"
+                title={`“${p.name}” is something to do, not a place — move it to the to-do list`}
+                onClick={() => onToTodo(p)}
+              >☑️</button>
             )}
             {editMode && <RowActions onEdit={() => onEditPlace(p)} onDelete={() => onDeletePlace(p)} />}
           </li>

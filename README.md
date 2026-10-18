@@ -8,6 +8,18 @@ A cute, minimal travel planner for two — first stop: **Vietnam & Japan, Nov–
   places with Google Maps links.
 - **City list** on the start page: stays pick their city (and colour) from it,
   and each trip's header sums up its cities.
+- **City bands**: a day in more than one city is split top-to-bottom, each
+  band as tall as the time spent there (from the travel's departure / arrival
+  times, if filled in).
+- **To-do list** per trip for things to tick off (book tickets, buy a SIM…);
+  a backup idea that's really a chore moves there with ☑️.
+- **Planned days**: mark a day as fully planned from its popup — the calendar
+  shows a small ✓ in the corner.
+- **Column widths**: in edit mode, drag a weekday header's right edge to
+  resize that column — like a spreadsheet, the planner grows with it (even past
+  the window, which then scrolls sideways) and the other columns keep their
+  size. ↔️ Fit screen makes it exactly as wide as the current window; ↺ next to
+  the month name goes back to automatic.
 - **Next time list**: mark what we didn't manage on a trip (🌱), then bring
   those ideas along when a later trip goes to the same city.
 - **View & edit modes**: anyone with the link can look, only we can edit

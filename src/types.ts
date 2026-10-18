@@ -4,6 +4,12 @@ export type Trip = {
   emoji: string
   start_date: string // 'YYYY-MM-DD', inclusive
   end_date: string // inclusive
+  /** Days whose planning is done ('YYYY-MM-DD'). */
+  planned_days: string[]
+  /** Calendar column widths set by hand, per month ('YYYY-MM' → 7 fr values). */
+  col_widths: Record<string, number[]>
+  /** Planner width in px set by widening columns; null = the standard width. */
+  page_width: number | null
 }
 
 /** A city on the shared list (start page) that stays pick from. */
@@ -31,6 +37,8 @@ export type Leg = {
   trip_id: string
   date: string // departure day
   arrive_date: string | null // arrival day if different (overnight flights etc.)
+  depart_time: string | null // 'HH:MM', optional
+  arrive_time: string | null // 'HH:MM', optional
   from_name: string
   to_name: string
   mode: TravelMode
@@ -55,13 +63,23 @@ export type Place = {
   leftover: boolean
 }
 
+/** Something to tick off for a trip, like pre-booking tickets. */
+export type Todo = {
+  id: string
+  trip_id: string
+  text: string
+  notes: string
+  done: boolean
+}
+
 export type TripData = {
   stays: Stay[]
   legs: Leg[]
   places: Place[]
+  todos: Todo[]
 }
 
-export const EMPTY_TRIP_DATA: TripData = { stays: [], legs: [], places: [] }
+export const EMPTY_TRIP_DATA: TripData = { stays: [], legs: [], places: [], todos: [] }
 
 export const MODES: { id: TravelMode; emoji: string; label: string }[] = [
   { id: 'flight', emoji: '✈️', label: 'Flight' },

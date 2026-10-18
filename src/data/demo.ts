@@ -1,7 +1,7 @@
-import type { City, Leg, Place, Stay, Trip } from '../types'
+import type { City, Leg, Place, Stay, Todo, Trip } from '../types'
 import { STAY_COLORS } from '../types'
 
-export type DB = { cities: City[]; trips: Trip[]; stays: Stay[]; legs: Leg[]; places: Place[] }
+export type DB = { cities: City[]; trips: Trip[]; stays: Stay[]; legs: Leg[]; places: Place[]; todos: Todo[] }
 
 /** One city per stay location, in the colour of its first stay. */
 export function citiesFromStays(stays: Stay[]): City[] {
@@ -26,6 +26,9 @@ export function seedData(): DB {
     emoji: '🌏',
     start_date: '2026-11-12',
     end_date: '2026-12-20',
+    planned_days: ['2026-11-13', '2026-11-14', '2026-11-15'],
+    col_widths: {},
+    page_width: null,
   }
 
   const mkStay = (
@@ -57,15 +60,16 @@ export function seedData(): DB {
   const mkLeg = (
     date: string, from_name: string, to_name: string,
     mode: Leg['mode'], notes = '', arrive_date: string | null = null,
-  ): Leg => ({ id: uid(), trip_id: tripId, date, arrive_date, from_name, to_name, mode, notes })
+    depart_time: string | null = null, arrive_time: string | null = null,
+  ): Leg => ({ id: uid(), trip_id: tripId, date, arrive_date, depart_time, arrive_time, from_name, to_name, mode, notes })
 
   const legs: Leg[] = [
     mkLeg('2026-11-12', 'Home', 'Hanoi', 'flight', 'Overnight flight', '2026-11-13'),
-    mkLeg('2026-11-17', 'Hanoi', 'Ha Long Bay', 'bus', '~2.5 h shuttle'),
+    mkLeg('2026-11-17', 'Hanoi', 'Ha Long Bay', 'bus', '~2.5 h shuttle', null, '09:00', '11:30'),
     mkLeg('2026-11-19', 'Ha Long Bay', 'Hoi An', 'flight', 'Via Da Nang'),
     mkLeg('2026-11-24', 'Hoi An', 'Ho Chi Minh City', 'flight'),
     mkLeg('2026-11-28', 'Ho Chi Minh City', 'Tokyo', 'flight'),
-    mkLeg('2026-12-04', 'Tokyo', 'Hakone', 'train', 'Romancecar from Shinjuku'),
+    mkLeg('2026-12-04', 'Tokyo', 'Hakone', 'train', 'Romancecar from Shinjuku', null, '15:00', '16:30'),
     mkLeg('2026-12-06', 'Hakone', 'Kyoto', 'train', 'Shinkansen from Odawara'),
     mkLeg('2026-12-11', 'Kyoto', 'Osaka', 'train'),
     mkLeg('2026-12-15', 'Osaka', 'Tokyo', 'train', 'Shinkansen'),
@@ -102,6 +106,9 @@ export function seedData(): DB {
     emoji: '🥐',
     start_date: '2026-04-10',
     end_date: '2026-04-15',
+    planned_days: [],
+    col_widths: {},
+    page_width: null,
   }
   const parisStay: Stay = {
     id: uid(), trip_id: parisId, location_name: 'Paris',
@@ -132,9 +139,14 @@ export function seedData(): DB {
     stays: allStays,
     legs: [
       ...legs,
-      { id: uid(), trip_id: parisId, date: '2026-04-10', arrive_date: null, from_name: 'Home', to_name: 'Paris', mode: 'flight', notes: '' },
-      { id: uid(), trip_id: parisId, date: '2026-04-15', arrive_date: null, from_name: 'Paris', to_name: 'Home', mode: 'flight', notes: '' },
+      { id: uid(), trip_id: parisId, date: '2026-04-10', arrive_date: null, depart_time: null, arrive_time: null, from_name: 'Home', to_name: 'Paris', mode: 'flight', notes: '' },
+      { id: uid(), trip_id: parisId, date: '2026-04-15', arrive_date: null, depart_time: null, arrive_time: null, from_name: 'Paris', to_name: 'Home', mode: 'flight', notes: '' },
     ],
     places: [...places, ...parisPlaces],
+    todos: [
+      { id: uid(), trip_id: tripId, text: 'Pre-book teamLab tickets', notes: 'Sells out weeks ahead', done: false },
+      { id: uid(), trip_id: tripId, text: 'Buy a Japan eSIM', notes: '', done: false },
+      { id: uid(), trip_id: tripId, text: 'Apply for the Vietnam e-visa', notes: '', done: true },
+    ],
   }
 }
