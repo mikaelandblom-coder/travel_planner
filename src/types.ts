@@ -129,5 +129,8 @@ export function timeRange(p: Pick<Place, 'start_time' | 'end_time'>): string {
   return ''
 }
 
-/** Sort key: timed visits first (by start), untimed last. */
-export const timeKey = (p: Pick<Place, 'start_time'>) => p.start_time ?? '~'
+/**
+ * Sort key: timed visits first (by start), untimed last. ('99:99', not a
+ * symbol like '~': localeCompare puts symbols before digits.)
+ */
+export const timeKey = (p: Pick<Place, 'start_time'>) => p.start_time ?? '99:99'

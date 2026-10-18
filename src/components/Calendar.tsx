@@ -120,31 +120,36 @@ const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5)
 const dayFrac = (t: string) => Math.min(1, Math.max(0, (minutes(t) - DAY_START) / (DAY_END - DAY_START)))
 
 /**
- * A day spent in more than one city, as stacked bands from morning (top) to
- * evening, each as tall as the time spent there. The day starts where we
- * woke up and each trip moves us on: we leave at its departure time and
- * arrive at its arrival time (the gap in between is travel). Without times,
- * the day is shared equally. Counted trips are those to one of the day's
- * stays, or out and back again the same day (a day trip) — a one-way trip
- * somewhere else (one of us flying home) doesn't move the planner.
- * Returns null for a day spent in one city.
+ * One stretch of a day: time in a city (`leg` null), or on the way between
+ * two (`city` null). `from` / `to` are fractions of the day.
  */
-function cityBands(iso: string, dayStays: Stay[], dayLegs: Leg[], colorOf: (city: string) => string): string | null {
-  if (dayStays.length === 0) return null
+type Segment = { color: string | null; city: string | null; leg: Leg | null; from: number; to: number }
+
+/**
+ * A day as stacked stretches from morning (top) to evening, each as tall as
+ * the time spent there. The day starts where we woke up and each trip moves
+ * us on: we leave at its departure time and arrive at its arrival time (the
+ * stretch in between is travel). Without times, the day is shared equally.
+ * Counted trips are those to one of the day's stays, or out and back again
+ * the same day (a day trip) — a one-way trip somewhere else (one of us
+ * flying home) doesn't move the planner.
+ */
+function daySegments(iso: string, dayStays: Stay[], dayLegs: Leg[], colorOf: (city: string) => string): Segment[] {
+  if (dayStays.length === 0) return [{ color: null, city: null, leg: null, from: 0, to: 1 }]
+  const stay = (city: string, from: number, to: number): Segment => ({ color: colorOf(city), city, leg: null, from, to })
   const stayCities = new Set(dayStays.map(s => s.location_name))
   const moves = dayLegs.filter(l =>
     stayCities.has(l.to_name) || dayLegs.some(o => o !== l && o.from_name === l.to_name))
   if (moves.length === 0) {
-    if (dayStays.length === 1) return null
-    // Several stays but no travel to go by: share the day equally.
+    // One city — or several with no travel to go by: share the day equally.
     const n = dayStays.length
-    return gradient(dayStays.map((s, i) => band(s.color, i / n, (i + 1) / n)))
+    return dayStays.map((s, i) => ({ color: s.color, city: s.location_name, leg: null, from: i / n, to: (i + 1) / n }))
   }
 
   // Earliest first (a trip that set off yesterday before any); untimed last.
-  const setOff = (l: Leg) => (l.date < iso ? '' : l.depart_time ?? '~')
+  const setOff = (l: Leg) => (l.date < iso ? '' : l.depart_time ?? '99:99')
   const left = [...moves].sort((a, b) => setOff(a).localeCompare(setOff(b)))
-  const stops: string[] = []
+  const segs: Segment[] = []
   let here = dayStays[0].location_name
   let cursor = 0
   for (let i = 1; left.length > 0; i++) {
@@ -156,18 +161,28 @@ function cityBands(iso: string, dayStays: Stay[], dayLegs: Leg[], colorOf: (city
     const even = i / (moves.length + 1)
     const leave = Math.max(cursor, dep ?? arr ?? even)
     const reach = Math.max(leave, arr ?? dep ?? even)
-    stops.push(band(colorOf(here), cursor, leave))
-    if (reach > leave) stops.push(band(TRAVEL_BG, leave, reach))
+    segs.push(stay(here, cursor, leave))
+    // Kept even when it takes no time: it holds the trip's line.
+    segs.push({ color: TRAVEL_BG, city: null, leg, from: leave, to: reach })
     cursor = reach
     here = leg.to_name
   }
-  stops.push(band(colorOf(here), cursor, 1))
-  return gradient(stops)
+  segs.push(stay(here, cursor, 1))
+  return segs
 }
 
-const band = (color: string, from: number, to: number) => `${color} ${pct(from)} ${pct(to)}`
-const gradient = (stops: string[]) => `linear-gradient(to bottom, ${stops.join(', ')})`
-const pct = (f: number) => `${(f * 100).toFixed(1)}%`
+/**
+ * Which stretch an activity belongs in: the one its time falls in; untimed,
+ * the first stretch in its city (or the first of the day).
+ */
+function segmentAt(segs: Segment[], time: string | null, city: string): number {
+  if (time) {
+    const f = dayFrac(time)
+    const i = segs.findIndex(s => s.from <= f && f < s.to)
+    return i >= 0 ? i : segs.length - 1
+  }
+  return Math.max(0, segs.findIndex(s => s.city === city))
+}
 
 /** Time shown on a travel line: departure on the way out, arrival on landing day. */
 function legTime(leg: Leg, iso: string): string {
@@ -237,10 +252,22 @@ function MonthGrid({
     ]
     for (const t of lines) colLen[col] = Math.max(colLen[col], t.length)
 
-    let style: CSSProperties | undefined
-    if (dayStays.length > 0) {
-      style = { background: cityBands(iso, dayStays, dayLegs, colorOf) ?? dayStays[0].color }
+    // Every line goes in the stretch of the day it happens in.
+    const segs = daySegments(iso, dayStays, dayLegs, colorOf)
+    const legsIn = segs.map(() => [] as Leg[])
+    const placesIn = segs.map(() => [] as Place[])
+    for (const l of dayLegs) {
+      const moved = segs.findIndex(s => s.leg === l)
+      legsIn[moved >= 0 ? moved : segmentAt(segs, iso === l.date ? l.depart_time : l.arrive_time, l.from_name)].push(l)
     }
+    for (const p of dayPlaces) {
+      const city = stays.find(s => s.id === p.stay_id)?.location_name ?? p.city
+      placesIn[segmentAt(segs, p.start_time, city)].push(p)
+    }
+    // The new city's name sits at the bottom of its stretch.
+    const labelAt = arriving
+      ? segs.map(s => s.city).lastIndexOf(arriving.location_name)
+      : -1
     const planned = trip.planned_days.includes(iso)
 
     const cls = ['day']
@@ -252,29 +279,40 @@ function MonthGrid({
       <button
         key={iso}
         className={cls.join(' ')}
-        style={style}
         onClick={() => onSelect(iso)}
         title={dayStays.map(s => s.location_name).join(' → ') || undefined}
       >
-        <span className="daynum">{d}</span>
-        {planned && <span className="day-planned" title="Planning done">✓</span>}
-        {(dayLegs.length > 0 || dayPlaces.length > 0) && (
-          <span className="day-acts">
-            {dayLegs.map(l => (
-              <span key={l.id} className="day-act leg">
-                {legTime(l, iso) && <span className="day-act-time">{legTime(l, iso)}</span>}
-                {legBadge(l, iso)} {l.from_name} → {l.to_name}
-              </span>
-            ))}
-            {dayPlaces.map(p => (
-              <span key={p.id} className="day-act">
-                {p.start_time && <span className="day-act-time">{p.start_time.slice(0, 5)}</span>}
-                {placeEmoji(p)} {p.name}
-              </span>
-            ))}
-          </span>
-        )}
-        {arriving && <span className="day-label">{arriving.location_name}</span>}
+        {segs.map((s, i) => {
+          const empty = legsIn[i].length === 0 && placesIn[i].length === 0 && i !== labelAt
+          // A stretch that takes no time and holds nothing isn't drawn.
+          if (i > 0 && empty && s.to <= s.from) return null
+          const style: CSSProperties = { flexGrow: s.to - s.from }
+          if (s.color) style.background = s.color
+          return (
+            <span key={i} className={'band' + (s.leg ? ' travel' : '')} style={style}>
+              {i === 0 && <span className="daynum">{d}</span>}
+              {(legsIn[i].length > 0 || placesIn[i].length > 0) && (
+                <span className="day-acts">
+                  {legsIn[i].map(l => (
+                    <span key={l.id} className="day-act leg">
+                      {legTime(l, iso) && <span className="day-act-time">{legTime(l, iso)}</span>}
+                      {legBadge(l, iso)} {l.from_name} → {l.to_name}
+                    </span>
+                  ))}
+                  {placesIn[i].map(p => (
+                    <span key={p.id} className="day-act">
+                      {p.start_time && <span className="day-act-time">{p.start_time.slice(0, 5)}</span>}
+                      {placeEmoji(p)} {p.name}
+                    </span>
+                  ))}
+                </span>
+              )}
+              {i === labelAt && arriving && <span className="day-label">{arriving.location_name}</span>}
+            </span>
+          )
+        })}
+        {/* an <i>, so .band:last-of-type still finds the last stretch */}
+        {planned && <i className="day-planned" title="Planning done">✓</i>}
       </button>,
     )
   }
