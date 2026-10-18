@@ -28,6 +28,7 @@ export function seedData(): DB {
     end_date: '2026-12-20',
     planned_days: ['2026-11-13', '2026-11-14', '2026-11-15'],
     col_widths: {},
+    page_width: null,
   }
 
   const mkStay = (
@@ -107,6 +108,7 @@ export function seedData(): DB {
     end_date: '2026-04-15',
     planned_days: [],
     col_widths: {},
+    page_width: null,
   }
   const parisStay: Stay = {
     id: uid(), trip_id: parisId, location_name: 'Paris',

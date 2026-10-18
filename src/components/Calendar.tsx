@@ -11,8 +11,13 @@ type Props = {
   selectedDate: string | null
   editMode: boolean
   onSelect: (iso: string) => void
-  /** Hand-set widths for a month ('YYYY-MM'); null = automatic again. */
-  onSaveColWidths: (month: string, widths: number[] | null) => void
+  /**
+   * Hand-set widths for a month ('YYYY-MM'; null = automatic again) and the
+   * planner's width in px (null = standard, undefined = unchanged).
+   */
+  onSaveColWidths: (month: string, widths: number[] | null, pageWidth?: number | null) => void
+  /** The planner's width while a column is being dragged (null = done). */
+  onPreviewPageWidth: (px: number | null) => void
 }
 
 /**
@@ -55,7 +60,9 @@ export function CityChips({ stays, selectedDate, onSelect }: {
   )
 }
 
-export function Calendar({ trip, stays, legs, places, selectedDate, editMode, onSelect, onSaveColWidths }: Props) {
+export function Calendar({
+  trip, stays, legs, places, selectedDate, editMode, onSelect, onSaveColWidths, onPreviewPageWidth,
+}: Props) {
   const sorted = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
   const all = [
     trip.start_date, trip.end_date,
@@ -83,6 +90,7 @@ export function Calendar({ trip, stays, legs, places, selectedDate, editMode, on
           editMode={editMode}
           onSelect={onSelect}
           onSaveColWidths={onSaveColWidths}
+          onPreviewPageWidth={onPreviewPageWidth}
         />
       ))}
     </section>
@@ -158,13 +166,16 @@ type MonthProps = {
   today: string
   editMode: boolean
   onSelect: (iso: string) => void
-  onSaveColWidths: (month: string, widths: number[] | null) => void
+  onSaveColWidths: Props['onSaveColWidths']
+  onPreviewPageWidth: Props['onPreviewPageWidth']
 }
 
 const MIN_COL = 0.4 // narrowest a dragged column gets, in fr
+const MIN_PAGE = 480 // narrowest the planner gets, in px
 
 function MonthGrid({
   year, month, trip, stays, legs, places, selectedDate, today, editMode, onSelect, onSaveColWidths,
+  onPreviewPageWidth,
 }: MonthProps) {
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const offset = mondayIndex(new Date(year, month, 1))
@@ -175,7 +186,8 @@ function MonthGrid({
   // Widths while a column edge is being dragged. Kept after letting go until
   // the saved widths come back, so the columns don't jump in between.
   const [dragWidths, setDragWidths] = useState<number[] | null>(null)
-  const drag = useRef<{ edge: number; x: number; start: number[]; pxPerFr: number } | null>(null)
+  const drag = useRef<{ col: number; x: number; start: number[]; pxPerFr: number; page: number } | null>(null)
+  const [dragPage, setDragPage] = useState<number | null>(null)
   const headRef = useRef<HTMLDivElement>(null)
   const savedKey = JSON.stringify(saved ?? null)
   useEffect(() => { setDragWidths(null) }, [savedKey])
@@ -255,46 +267,61 @@ function MonthGrid({
   const widths = dragWidths ?? (saved?.length === 7 ? saved : auto)
   const template = widths.map(w => `minmax(0, ${w.toFixed(2)}fr)`).join(' ')
 
-  // Dragging the edge between two columns trades width between just those
-  // two, so the rest of the month keeps its shape.
-  function startDrag(e: PointerEvent<HTMLSpanElement>, edge: number) {
+  // Like a spreadsheet: dragging a column's right edge widens just that
+  // column and the whole planner grows with it — the other columns keep
+  // their size. Once the planner fills the window it can't grow further,
+  // and the columns share what's there.
+  function startDrag(e: PointerEvent<HTMLSpanElement>, col: number) {
     const grid = headRef.current
-    if (!grid) return
+    const app = grid?.closest<HTMLElement>('.app')
+    if (!grid || !app) return
     e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
     const gap = parseFloat(getComputedStyle(grid).columnGap) || 0
     const total = widths.reduce((a, b) => a + b, 0)
-    drag.current = { edge, x: e.clientX, start: widths, pxPerFr: (grid.clientWidth - 6 * gap) / total }
+    drag.current = {
+      col, x: e.clientX, start: widths,
+      pxPerFr: (grid.clientWidth - 6 * gap) / total,
+      page: app.getBoundingClientRect().width,
+    }
     setDragWidths(widths)
   }
   function moveDrag(e: PointerEvent<HTMLSpanElement>) {
     const g = drag.current
     if (!g) return
-    const pair = g.start[g.edge] + g.start[g.edge + 1]
-    const left = Math.min(pair - MIN_COL, Math.max(MIN_COL, g.start[g.edge] + (e.clientX - g.x) / g.pxPerFr))
+    // Never narrower than MIN_COL, nor than would make the planner tiny.
+    const minDx = Math.max((MIN_COL - g.start[g.col]) * g.pxPerFr, MIN_PAGE - g.page)
+    const dx = Math.max(minDx, e.clientX - g.x)
     const next = [...g.start]
-    next[g.edge] = left
-    next[g.edge + 1] = pair - left
+    next[g.col] = g.start[g.col] + dx / g.pxPerFr
     setDragWidths(next)
+    setDragPage(Math.round(g.page + dx))
+    onPreviewPageWidth(Math.round(g.page + dx))
   }
   function endDrag() {
     const g = drag.current
     if (!g) return
     drag.current = null
     // A tap on the edge without moving it isn't a choice to pin the widths.
-    if (!dragWidths || dragWidths.every((w, i) => w === g.start[i])) { setDragWidths(null); return }
-    onSaveColWidths(monthKey, dragWidths.map(w => Math.round(w * 100) / 100))
+    if (!dragWidths || dragPage === null || dragWidths.every((w, i) => w === g.start[i])) {
+      setDragWidths(null)
+      setDragPage(null)
+      onPreviewPageWidth(null)
+      return
+    }
+    setDragPage(null)
+    onSaveColWidths(monthKey, dragWidths.map(w => Math.round(w * 100) / 100), dragPage)
   }
 
   return (
     <div className="month card">
       <h2 className="month-title">
         {monthLabel(year, month)}
-        {editMode && saved && (
+        {editMode && (saved || trip.page_width) && (
           <button
             className="icon-btn month-reset"
-            title="Back to automatic column widths"
-            onClick={() => onSaveColWidths(monthKey, null)}
+            title="Back to automatic column widths and the standard planner width"
+            onClick={() => onSaveColWidths(monthKey, null, null)}
           >↺</button>
         )}
       </h2>
@@ -302,10 +329,10 @@ function MonthGrid({
         {WEEKDAYS.map((w, i) => (
           <div key={w} className={'wd' + (w === 'Sat' || w === 'Sun' ? ' wknd' : '')}>
             {w}
-            {editMode && i < 6 && (
+            {editMode && (
               <span
                 className="col-handle"
-                title="Drag to resize the columns"
+                title="Drag to resize this column — the planner grows or shrinks with it"
                 onPointerDown={e => startDrag(e, i)}
                 onPointerMove={moveDrag}
                 onPointerUp={endDrag}

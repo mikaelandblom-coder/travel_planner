@@ -11,6 +11,7 @@ create table trips (
   end_date date not null,
   planned_days date[] not null default '{}',  -- days whose planning is done
   col_widths jsonb not null default '{}',     -- hand-set calendar column widths per month
+  page_width integer,                         -- planner width in px (null = standard)
   created_at timestamptz not null default now()
 );
 

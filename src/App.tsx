@@ -41,6 +41,8 @@ export default function App() {
   const [modal, setModal] = useState<ModalState | null>(null)
   const [offline, setOffline] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  // The planner's width while a calendar column is being dragged.
+  const [previewWidth, setPreviewWidth] = useState<number | null>(null)
 
   const trip = trips?.find(t => t.id === tripId) ?? null
 
@@ -215,13 +217,19 @@ export default function App() {
     void persist(() => store.saveTrip({ ...trip, planned_days }), { trips: true })
   }
 
-  /** Hand-set column widths for one month; null = back to automatic. */
-  function saveColWidths(month: string, widths: number[] | null) {
+  /**
+   * Hand-set column widths for one month (null = back to automatic) and the
+   * planner width they need (null = standard, undefined = leave as is).
+   */
+  function saveColWidths(month: string, widths: number[] | null, pageWidth?: number | null) {
     if (!trip) return
     const col_widths = { ...trip.col_widths }
     if (widths) col_widths[month] = widths
     else delete col_widths[month]
-    void persist(() => store.saveTrip({ ...trip, col_widths }), { trips: true })
+    const page_width = pageWidth === undefined ? trip.page_width : pageWidth
+    // Keep the dragged width showing until the saved trip comes back.
+    void persist(() => store.saveTrip({ ...trip, col_widths, page_width }), { trips: true })
+      .then(() => setPreviewWidth(null))
   }
 
   /**
@@ -297,6 +305,7 @@ export default function App() {
                   id: modal.trip?.id ?? uid(),
                   planned_days: modal.trip?.planned_days ?? [],
                   col_widths: modal.trip?.col_widths ?? {},
+                  page_width: modal.trip?.page_width ?? null,
                   ...v,
                 }
                 void persist(async () => { await store.saveTrip(t); openTrip(t) }, { trips: true })
@@ -381,11 +390,14 @@ export default function App() {
     }
   }
 
+  // A trip can ask for a wider (or narrower) planner than the standard one.
+  const pageWidth = trip ? previewWidth ?? trip.page_width : null
+
   const totalDays = trip ? daysBetween(trip.start_date, trip.end_date) + 1 : 0
   const tripCities = new Set(data.stays.map(s => s.location_name))
 
   return (
-    <div className="app">
+    <div className="app" style={pageWidth ? { maxWidth: pageWidth } : undefined}>
       <header className="header card">
         <div className="brand">
           <span className="brand-emoji">{trip?.emoji || '🧳'}</span>
@@ -442,6 +454,7 @@ export default function App() {
             editMode={editMode}
             onSelect={setSelectedDate}
             onSaveColWidths={saveColWidths}
+            onPreviewPageWidth={setPreviewWidth}
           />
           <Overview
             trip={trip}

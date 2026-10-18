@@ -35,7 +35,9 @@ export interface Store {
 }
 
 /** Rows saved before a column existed (or cached then) get its default. */
-const withTripDefaults = (t: Trip): Trip => ({ ...t, planned_days: t.planned_days ?? [], col_widths: t.col_widths ?? {} })
+const withTripDefaults = (t: Trip): Trip => ({
+  ...t, planned_days: t.planned_days ?? [], col_widths: t.col_widths ?? {}, page_width: t.page_width ?? null,
+})
 const withLegDefaults = (l: Leg): Leg => ({ ...l, depart_time: l.depart_time ?? null, arrive_time: l.arrive_time ?? null })
 
 export function createStore(): Store {

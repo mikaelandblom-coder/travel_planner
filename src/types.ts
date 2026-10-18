@@ -8,6 +8,8 @@ export type Trip = {
   planned_days: string[]
   /** Calendar column widths set by hand, per month ('YYYY-MM' → 7 fr values). */
   col_widths: Record<string, number[]>
+  /** Planner width in px set by widening columns; null = the standard width. */
+  page_width: number | null
 }
 
 /** A city on the shared list (start page) that stays pick from. */

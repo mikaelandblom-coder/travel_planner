@@ -28,6 +28,8 @@ create policy "editors write todos" on todos
 alter table trips add column if not exists planned_days date[] not null default '{}';
 -- Calendar column widths set by hand, per month: { "2026-11": [1, 1.4, …] }.
 alter table trips add column if not exists col_widths jsonb not null default '{}';
+-- Planner width in px after widening columns (null = the standard width).
+alter table trips add column if not exists page_width integer;
 
 alter table legs add column if not exists depart_time time;
 alter table legs add column if not exists arrive_time time;

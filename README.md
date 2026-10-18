@@ -15,8 +15,10 @@ A cute, minimal travel planner for two — first stop: **Vietnam & Japan, Nov–
   a backup idea that's really a chore moves there with ☑️.
 - **Planned days**: mark a day as fully planned from its popup — the calendar
   shows a small ✓ in the corner.
-- **Column widths**: in edit mode, drag the edges between the weekday headers
-  to resize a month's columns (↺ next to the month name goes back to automatic).
+- **Column widths**: in edit mode, drag a weekday header's right edge to
+  resize that column — like a spreadsheet, the planner grows with it (up to the
+  window width) and the other columns keep their size. ↺ next to the month
+  name goes back to automatic.
 - **Next time list**: mark what we didn't manage on a trip (🌱), then bring
   those ideas along when a later trip goes to the same city.
 - **View & edit modes**: anyone with the link can look, only we can edit
