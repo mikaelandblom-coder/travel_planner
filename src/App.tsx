@@ -15,7 +15,7 @@ type ModalState =
   | { type: 'trip'; trip?: Trip }
   | { type: 'city'; city?: City }
   | { type: 'stay'; stay?: Stay; defaultDate?: string }
-  | { type: 'leg'; leg?: Leg; defaultDate?: string }
+  | { type: 'leg'; leg?: Leg; defaultDate?: string; defaultFrom?: string; dayTrip?: boolean }
   | { type: 'place'; place?: Place; defaultStayId?: string | null; defaultDate?: string | null; defaultLeftover?: boolean }
   | { type: 'login' }
 
@@ -361,10 +361,20 @@ export default function App() {
             <LegForm
               initial={modal.leg}
               defaultDate={modal.defaultDate}
+              defaultFrom={modal.defaultFrom}
+              defaultDayTrip={modal.dayTrip}
               cities={cities}
-              onSave={v => {
+              onSave={(v, back) => {
                 const l: Leg = { id: modal.leg?.id ?? uid(), trip_id: trip!.id, ...v }
-                void persist(() => store.saveLeg(l))
+                void persist(async () => {
+                  await store.saveLeg(l)
+                  if (back) {
+                    await store.saveLeg({
+                      ...l, id: uid(), from_name: l.to_name, to_name: l.from_name,
+                      arrive_date: null, ...back, notes: '',
+                    })
+                  }
+                })
               }}
               onDelete={modal.leg ? () => deleteLeg(modal.leg!) : undefined}
             />
@@ -466,6 +476,7 @@ export default function App() {
             stays={data.stays}
             legs={data.legs}
             places={data.places}
+            cities={cities}
             selectedDate={selectedDate}
             editMode={editMode}
             onSelect={setSelectedDate}
@@ -481,7 +492,8 @@ export default function App() {
             editMode={editMode}
             onSelectDate={setSelectedDate}
             onEditStay={(stay, defaultDate) => setModal({ type: 'stay', stay, defaultDate })}
-            onEditLeg={(leg, defaultDate) => setModal({ type: 'leg', leg, defaultDate })}
+            onEditLeg={(leg, defaultDate, defaultFrom, dayTrip) =>
+            setModal({ type: 'leg', leg, defaultDate, defaultFrom, dayTrip })}
             onEditPlace={(place, defaultStayId, defaultDate, defaultLeftover) =>
               setModal({ type: 'place', place, defaultStayId, defaultDate, defaultLeftover })}
             onAssignStay={assignStayToDay}
@@ -521,7 +533,8 @@ export default function App() {
           editMode={editMode}
           onSelectDate={setSelectedDate}
           onEditStay={(stay, defaultDate) => setModal({ type: 'stay', stay, defaultDate })}
-          onEditLeg={(leg, defaultDate) => setModal({ type: 'leg', leg, defaultDate })}
+          onEditLeg={(leg, defaultDate, defaultFrom, dayTrip) =>
+            setModal({ type: 'leg', leg, defaultDate, defaultFrom, dayTrip })}
           onEditPlace={(place, defaultStayId, defaultDate) => setModal({ type: 'place', place, defaultStayId, defaultDate })}
           onAssignStay={assignStayToDay}
           onDeleteStay={deleteStay}

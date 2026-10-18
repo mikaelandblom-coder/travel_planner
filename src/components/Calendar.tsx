@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
-import type { Leg, Place, Stay, Trip } from '../types'
+import type { City, Leg, Place, Stay, Trip } from '../types'
 import { modeEmoji, placeEmoji, timeKey } from '../types'
 import { mondayIndex, monthLabel, monthsInRange, todayISO, WEEKDAYS } from '../lib/dates'
 
@@ -8,6 +8,8 @@ type Props = {
   stays: Stay[]
   legs: Leg[]
   places: Place[]
+  /** The shared city list, for the colour of a day trip's city. */
+  cities: City[]
   selectedDate: string | null
   editMode: boolean
   onSelect: (iso: string) => void
@@ -61,7 +63,7 @@ export function CityChips({ stays, selectedDate, onSelect }: {
 }
 
 export function Calendar({
-  trip, stays, legs, places, selectedDate, editMode, onSelect, onSaveColWidths, onPreviewPageWidth,
+  trip, stays, legs, places, cities, selectedDate, editMode, onSelect, onSaveColWidths, onPreviewPageWidth,
 }: Props) {
   const sorted = [...stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
   const all = [
@@ -73,6 +75,8 @@ export function Calendar({
   const max = all.reduce((a, b) => (a > b ? a : b))
   const months = monthsInRange(min, max)
   const today = todayISO()
+  const colorOf = (city: string) =>
+    cities.find(c => c.name === city)?.color ?? stays.find(s => s.location_name === city)?.color ?? OTHER_CITY_BG
 
   return (
     <section className="calendar">
@@ -83,6 +87,7 @@ export function Calendar({
           month={month}
           trip={trip}
           stays={sorted}
+          colorOf={colorOf}
           legs={legs}
           places={places}
           selectedDate={selectedDate}
@@ -109,44 +114,59 @@ function legBadge(leg: Leg, iso: string): string {
 const DAY_START = 7 * 60
 const DAY_END = 23 * 60
 const TRAVEL_BG = '#faf6f0'
+const OTHER_CITY_BG = '#efe6da' // a city that's not on the city list
 
 const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5))
 const dayFrac = (t: string) => Math.min(1, Math.max(0, (minutes(t) - DAY_START) / (DAY_END - DAY_START)))
 
 /**
- * A day spent in several cities, as stacked bands from morning (top) to
- * evening, each as tall as the time spent there. The travel between two
- * stays sets the split: we leave one at its departure time and reach the
- * next at its arrival time (the gap in between is travel). Without times,
- * the cities share the day equally.
+ * A day spent in more than one city, as stacked bands from morning (top) to
+ * evening, each as tall as the time spent there. The day starts where we
+ * woke up and each trip moves us on: we leave at its departure time and
+ * arrive at its arrival time (the gap in between is travel). Without times,
+ * the day is shared equally. Counted trips are those to one of the day's
+ * stays, or out and back again the same day (a day trip) — a one-way trip
+ * somewhere else (one of us flying home) doesn't move the planner.
+ * Returns null for a day spent in one city.
  */
-function cityBands(iso: string, dayStays: Stay[], dayLegs: Leg[]): string {
-  const n = dayStays.length
-  const used = new Set<Leg>()
+function cityBands(iso: string, dayStays: Stay[], dayLegs: Leg[], colorOf: (city: string) => string): string | null {
+  if (dayStays.length === 0) return null
+  const stayCities = new Set(dayStays.map(s => s.location_name))
+  const moves = dayLegs.filter(l =>
+    stayCities.has(l.to_name) || dayLegs.some(o => o !== l && o.from_name === l.to_name))
+  if (moves.length === 0) {
+    if (dayStays.length === 1) return null
+    // Several stays but no travel to go by: share the day equally.
+    const n = dayStays.length
+    return gradient(dayStays.map((s, i) => band(s.color, i / n, (i + 1) / n)))
+  }
+
+  // Earliest first (a trip that set off yesterday before any); untimed last.
+  const setOff = (l: Leg) => (l.date < iso ? '' : l.depart_time ?? '~')
+  const left = [...moves].sort((a, b) => setOff(a).localeCompare(setOff(b)))
   const stops: string[] = []
+  let here = dayStays[0].location_name
   let cursor = 0
-  for (let i = 0; i < n - 1; i++) {
-    const a = dayStays[i]
-    const b = dayStays[i + 1]
-    const leg =
-      dayLegs.find(l => !used.has(l) && l.from_name === a.location_name && l.to_name === b.location_name) ??
-      dayLegs.find(l => !used.has(l) && (l.from_name === a.location_name || l.to_name === b.location_name))
-    if (leg) used.add(leg)
-    const dep = leg?.date === iso && leg.depart_time ? dayFrac(leg.depart_time) : null
-    const arr = leg && (leg.arrive_date ?? leg.date) === iso && leg.arrive_time ? dayFrac(leg.arrive_time)
-      : leg?.arrive_date && leg.arrive_date > iso ? 1 // still travelling at midnight
-      : null
-    const even = (i + 1) / n
+  for (let i = 1; left.length > 0; i++) {
+    // Follow the chain: next, the trip that leaves from where we are.
+    const leg = left.splice(Math.max(0, left.findIndex(l => l.from_name === here)), 1)[0]
+    const dep = leg.date < iso ? 0 : leg.depart_time ? dayFrac(leg.depart_time) : null
+    const arr = (leg.arrive_date ?? leg.date) > iso ? 1 // still travelling at midnight
+      : leg.arrive_time ? dayFrac(leg.arrive_time) : null
+    const even = i / (moves.length + 1)
     const leave = Math.max(cursor, dep ?? arr ?? even)
     const reach = Math.max(leave, arr ?? dep ?? even)
-    stops.push(`${a.color} ${pct(cursor)} ${pct(leave)}`)
-    if (reach > leave) stops.push(`${TRAVEL_BG} ${pct(leave)} ${pct(reach)}`)
+    stops.push(band(colorOf(here), cursor, leave))
+    if (reach > leave) stops.push(band(TRAVEL_BG, leave, reach))
     cursor = reach
+    here = leg.to_name
   }
-  stops.push(`${dayStays[n - 1].color} ${pct(cursor)} 100%`)
-  return `linear-gradient(to bottom, ${stops.join(', ')})`
+  stops.push(band(colorOf(here), cursor, 1))
+  return gradient(stops)
 }
 
+const band = (color: string, from: number, to: number) => `${color} ${pct(from)} ${pct(to)}`
+const gradient = (stops: string[]) => `linear-gradient(to bottom, ${stops.join(', ')})`
 const pct = (f: number) => `${(f * 100).toFixed(1)}%`
 
 /** Time shown on a travel line: departure on the way out, arrival on landing day. */
@@ -160,6 +180,7 @@ type MonthProps = {
   month: number // 0-based
   trip: Trip
   stays: Stay[]
+  colorOf: (city: string) => string
   legs: Leg[]
   places: Place[]
   selectedDate: string | null
@@ -174,7 +195,7 @@ const MIN_COL = 0.4 // narrowest a dragged column gets, in fr
 const MIN_PAGE = 480 // narrowest the planner gets, in px
 
 function MonthGrid({
-  year, month, trip, stays, legs, places, selectedDate, today, editMode, onSelect, onSaveColWidths,
+  year, month, trip, stays, colorOf, legs, places, selectedDate, today, editMode, onSelect, onSaveColWidths,
   onPreviewPageWidth,
 }: MonthProps) {
   const daysInMonth = new Date(year, month + 1, 0).getDate()
@@ -217,10 +238,8 @@ function MonthGrid({
     for (const t of lines) colLen[col] = Math.max(colLen[col], t.length)
 
     let style: CSSProperties | undefined
-    if (dayStays.length === 1) {
-      style = { background: dayStays[0].color }
-    } else if (dayStays.length >= 2) {
-      style = { background: cityBands(iso, dayStays, dayLegs) }
+    if (dayStays.length > 0) {
+      style = { background: cityBands(iso, dayStays, dayLegs, colorOf) ?? dayStays[0].color }
     }
     const planned = trip.planned_days.includes(iso)
 

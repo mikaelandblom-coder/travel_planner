@@ -230,11 +230,17 @@ export function StayForm({ initial, defaultDate, cities, onSave, onDelete }: {
   )
 }
 
-export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
+/** The trip back on a day trip; saved as its own travel line. */
+export type ReturnTrip = { depart_time: string | null; arrive_time: string | null }
+
+export function LegForm({ initial, defaultDate, defaultFrom, defaultDayTrip, cities, onSave, onDelete }: {
   initial?: Leg
   defaultDate?: string
+  defaultFrom?: string
+  /** Start with "back the same day" ticked (the ＋ Day trip button). */
+  defaultDayTrip?: boolean
   cities: City[]
-  onSave: (v: Omit<Leg, 'id' | 'trip_id'>) => void
+  onSave: (v: Omit<Leg, 'id' | 'trip_id'>, back: ReturnTrip | null) => void
   onDelete?: () => void
 }) {
   const [date, setDate] = useState(initial?.date ?? defaultDate ?? '')
@@ -242,10 +248,15 @@ export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
   // DB time columns come back as 'HH:MM:SS' — the time input wants 'HH:MM'.
   const [departTime, setDepartTime] = useState(initial?.depart_time?.slice(0, 5) ?? '')
   const [arriveTime, setArriveTime] = useState(initial?.arrive_time?.slice(0, 5) ?? '')
-  const [from, setFrom] = useState(initial?.from_name ?? '')
+  const [from, setFrom] = useState(initial?.from_name ?? defaultFrom ?? '')
   const [to, setTo] = useState(initial?.to_name ?? '')
   const [mode, setMode] = useState<TravelMode>(initial?.mode ?? 'flight')
   const [notes, setNotes] = useState(initial?.notes ?? '')
+  const [back, setBack] = useState(defaultDayTrip ?? false)
+  const [backDepart, setBackDepart] = useState('')
+  const [backArrive, setBackArrive] = useState('')
+  // Only a same-day trip can come back the same day.
+  const sameDay = !arrive || arrive === date
 
   function submit(e: FormEvent) {
     e.preventDefault()
@@ -255,7 +266,7 @@ export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
     onSave({
       date: dep, arrive_date: arr, depart_time: departTime || null, arrive_time: arriveTime || null,
       from_name: from.trim(), to_name: to.trim(), mode, notes: notes.trim(),
-    })
+    }, back && sameDay ? { depart_time: backDepart || null, arrive_time: backArrive || null } : null)
   }
 
   return (
@@ -285,6 +296,25 @@ export function LegForm({ initial, defaultDate, cities, onSave, onDelete }: {
         </Field>
       </div>
       <CityOptions id="leg-cities" cities={cities} />
+      {sameDay && (
+        <label className="check-field">
+          <input type="checkbox" checked={back} onChange={e => setBack(e.target.checked)} />
+          <span>
+            <strong>↩️ Back the same day</strong>
+            <span className="hint">A day trip — also adds the trip back{to.trim() ? ` from ${to.trim()}` : ''}{from.trim() ? ` to ${from.trim()}` : ''}.</span>
+          </span>
+        </label>
+      )}
+      {sameDay && back && (
+        <div className="field-row">
+          <Field label="Back: departs at">
+            <input type="time" value={backDepart} onChange={e => setBackDepart(e.target.value)} />
+          </Field>
+          <Field label="Back: arrives at">
+            <input type="time" value={backArrive} onChange={e => setBackArrive(e.target.value)} />
+          </Field>
+        </div>
+      )}
       <Field label="How">
         <div className="swatches">
           {MODES.map(m => (
