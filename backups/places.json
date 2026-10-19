@@ -96,22 +96,6 @@
     "city": "Saigon"
   },
   {
-    "id": "10e18939-8fa9-428a-a550-82dff91d72bb",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Boka båtresa i Kyoto",
-    "category": "sight",
-    "map_url": "",
-    "notes": "",
-    "created_at": "2026-07-18T12:56:58.918718+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "🚣",
-    "leftover": false,
-    "city": ""
-  },
-  {
     "id": "13ffdc3c-07d4-4d9c-9620-1c692d748535",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -176,22 +160,6 @@
     "city": "Paris"
   },
   {
-    "id": "28ff59b3-a944-4048-a8f2-adbb9b3a9c7c",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Boka Fuiji tåg",
-    "category": "sight",
-    "map_url": "",
-    "notes": "Dagsutflykt: åker 0700 från Tokyo hemma igen på kvällen",
-    "created_at": "2026-07-18T12:58:48.843239+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "🏔️",
-    "leftover": false,
-    "city": ""
-  },
-  {
     "id": "2a4f7ba7-e294-4762-8c23-9e81b423d2fc",
     "trip_id": "be913ed3-6be3-418d-8d75-b8c0983a6cb4",
     "stay_id": null,
@@ -222,22 +190,6 @@
     "emoji": "🍍",
     "leftover": true,
     "city": "Paris"
-  },
-  {
-    "id": "2ce9e238-a07e-4b95-9b66-8ec5db83ebdf",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Köp ICOCA kort på flygplatsen",
-    "category": "sight",
-    "map_url": "",
-    "notes": "Finns att klpa hos JR/Nankai-disken",
-    "created_at": "2026-07-18T12:55:51.057521+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "💳",
-    "leftover": false,
-    "city": ""
   },
   {
     "id": "311003ea-eed7-4f33-8f74-13f53aacab22",
@@ -640,22 +592,6 @@
     "city": "Osaka"
   },
   {
-    "id": "6bc03b73-4b64-490e-a045-ef7916e58cfd",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Boka Universal, Disneyland, Teamlabs, Umeda sky building",
-    "category": "sight",
-    "map_url": "",
-    "notes": "",
-    "created_at": "2026-07-18T12:58:01.989221+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "🎪",
-    "leftover": false,
-    "city": ""
-  },
-  {
     "id": "6cee52a0-47cd-4250-9595-60160710806d",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "stay_id": "d63cee71-e86c-4d55-9716-21e81764d06b",
@@ -830,22 +766,6 @@
     "emoji": "🏛️",
     "leftover": false,
     "city": "Paris"
-  },
-  {
-    "id": "815d9467-76d5-4fa2-9661-1a9af06526dd",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Köp klook attraktion paket Osaka",
-    "category": "sight",
-    "map_url": "",
-    "notes": "",
-    "created_at": "2026-07-18T12:54:29.013634+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "💵",
-    "leftover": false,
-    "city": ""
   },
   {
     "id": "820ef5e5-89ee-4943-93a0-c8f26256665b",
@@ -1118,38 +1038,6 @@
     "emoji": "🏰",
     "leftover": true,
     "city": "Paris"
-  },
-  {
-    "id": "adec063a-2a90-42f9-92aa-164041e2513b",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Köp Shinkensen biljett Kyoto till Tokyo",
-    "category": "sight",
-    "map_url": "",
-    "notes": "En månad innan vi åker till VN\nKöp på vänster sida Kyoto -> Tokyo (Fuji seat)\nKöp bagageplats",
-    "created_at": "2026-07-18T12:56:34.675978+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "🚝",
-    "leftover": false,
-    "city": ""
-  },
-  {
-    "id": "aee2a808-dcb5-414b-9c19-5603bcb55a43",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Köp flygbussarna",
-    "category": "sight",
-    "map_url": "",
-    "notes": "",
-    "created_at": "2026-10-17T08:32:59.922478+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "🚌",
-    "leftover": false,
-    "city": ""
   },
   {
     "id": "b548d57d-18a6-4f05-a983-dfd9a0adbb2d",
@@ -1468,22 +1356,6 @@
     "start_time": "12:00:00",
     "end_time": null,
     "emoji": "🍣",
-    "leftover": false,
-    "city": ""
-  },
-  {
-    "id": "e4a7a3f8-1dc1-43d4-a0db-72190bf9c0d0",
-    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "stay_id": null,
-    "name": "Handla saker i Vietnam",
-    "category": "sight",
-    "map_url": "",
-    "notes": "Gui Cuon saker: doppa vatten och lyft upp på talrik",
-    "created_at": "2026-07-24T14:07:53.326161+00:00",
-    "date": null,
-    "start_time": null,
-    "end_time": null,
-    "emoji": "🛒",
     "leftover": false,
     "city": ""
   },

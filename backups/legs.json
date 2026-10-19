@@ -8,7 +8,9 @@
     "mode": "flight",
     "notes": "Flyget går 06:10, vi landar 06:35",
     "created_at": "2026-07-11T19:48:48.606471+00:00",
-    "arrive_date": "2026-11-15"
+    "arrive_date": "2026-11-15",
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "1a08eeb2-5e75-49b4-8859-0dbbdbba9f11",
@@ -19,7 +21,9 @@
     "mode": "flight",
     "notes": "Micke åker hem. Flyget går 00:20 den 10e så vi behöver åka till flygplatsen den 9e",
     "created_at": "2026-07-12T14:35:07.690643+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "307600cd-0787-48af-9537-7f6b5730a7c5",
@@ -30,7 +34,9 @@
     "mode": "flight",
     "notes": "Flygbuss går 10:52 och är framme 11:25\n14:10 SK575\nFramme 16:45\nFlygplats: Charles de Gaulle",
     "created_at": "2026-08-01T09:03:08.213972+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "3601c659-31c5-460f-88ca-b0b5f2e23c52",
@@ -41,7 +47,9 @@
     "mode": "car",
     "notes": "",
     "created_at": "2026-07-12T14:33:03.029867+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "3e748f8c-fc42-4424-b2db-c03353baf32c",
@@ -52,7 +60,9 @@
     "mode": "flight",
     "notes": "Flyget går 00:05 den 18e men vi behöver vara på flygplatsen den 17e. Landar 07:00. Ta JR Haruka till Osaka Station ca 50m 1800 yen/p",
     "created_at": "2026-07-12T08:18:04.742133+00:00",
-    "arrive_date": "2026-11-18"
+    "arrive_date": "2026-11-18",
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "72477f25-4e69-4fef-b908-d418d2e27d96",
@@ -63,7 +73,9 @@
     "mode": "flight",
     "notes": "Lämna hotellet 7.30\nPlanet går 10.30 SK574\nFramme 13.00",
     "created_at": "2026-08-01T09:04:07.362741+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "78edf5bb-a67e-4f02-b6eb-6412079bdd70",
@@ -74,7 +86,9 @@
     "mode": "train",
     "notes": "Taxi till Kyoto Station. Ta tåg Nozomi Green Car till Tokyo Station. Tar ca 2h15m ca 30-40k yen för 2p. Boka säten A+B. Ta tåg JR Yamanote Line till Takadanobaba Station ca 25m. Sen gå 3m till hottellet",
     "created_at": "2026-07-12T08:21:49.603524+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "8d7d36b6-324b-46be-98fd-868b8ca335db",
@@ -85,7 +99,9 @@
     "mode": "train",
     "notes": "JR Special Rapid till Kyoto Station ca 30m 580 yen/p ca 9m med taxi till hotellet",
     "created_at": "2026-07-12T08:19:52.100576+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "8ffa02de-7eee-4dca-9c64-bec91150caff",
@@ -96,7 +112,9 @@
     "mode": "car",
     "notes": "",
     "created_at": "2026-07-12T14:33:29.60864+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "aae68671-5040-4ee1-a6ba-2fcd3d3a5f60",
@@ -107,7 +125,9 @@
     "mode": "flight",
     "notes": "",
     "created_at": "2026-07-12T08:22:48.107414+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   },
   {
     "id": "c9a1c907-30af-4773-a857-a35a2d5449c2",
@@ -115,10 +135,12 @@
     "date": "2026-11-20",
     "from_name": "Osaka",
     "to_name": "Nara",
-    "mode": "train",
+    "mode": "flight",
     "notes": "Platform 1 Osaka Loop Line\nTåget heter Yamatoji Rapid Service mot Nara eller Kamo\nKliv inte på tåget Local Loop\n50 minuter 840 yen\nGår att betala med ICOCA & SUICA\nKliver av vid station JR Nara Station\nTar ca 20m att gå till parken från stationen",
     "created_at": "2026-10-17T08:42:28.144958+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": "08:15:00",
+    "arrive_time": "09:05:00"
   },
   {
     "id": "f9ebd825-c35d-440e-8e25-408101e731f1",
@@ -129,6 +151,8 @@
     "mode": "flight",
     "notes": "Mai åker hem, flyget går 23:50",
     "created_at": "2026-07-12T14:35:33.823659+00:00",
-    "arrive_date": null
+    "arrive_date": null,
+    "depart_time": null,
+    "arrive_time": null
   }
 ]
