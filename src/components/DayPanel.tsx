@@ -41,12 +41,22 @@ export function Overview({
   onToggleLeftover, onCarryOver, onAddTodo, onSaveTodo, onDeleteTodo, onPlaceToTodo,
 }: OverviewProps) {
   const stays = [...data.stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
-  // The backup list: everything not yet allocated to a day. General ideas
-  // first, then grouped by stay in trip order.
   const stayStart = (p: Place) => stays.find(s => s.id === p.stay_id)?.start_date ?? ''
-  const backup = data.places
-    .filter(p => !p.date && !p.leftover)
-    .sort((a, b) => stayStart(a).localeCompare(stayStart(b)))
+  // The backup list: everything not yet allocated to a day, grouped by city
+  // (a stay's city wins over the place's own). General ideas first, then the
+  // trip's cities in the order we first get there, then other cities A–Z.
+  const cityOf = (p: Place) => stays.find(s => s.id === p.stay_id)?.location_name ?? p.city
+  const firstVisit = (city: string) => stays.find(s => s.location_name === city)?.start_date
+  const backupGroups: { city: string; color: string | null; places: Place[] }[] = []
+  for (const p of data.places.filter(p => !p.date && !p.leftover)) {
+    const city = cityOf(p)
+    const group = backupGroups.find(g => g.city === city)
+    if (group) group.places.push(p)
+    else backupGroups.push({ city, color: stays.find(s => s.location_name === city)?.color ?? null, places: [p] })
+  }
+  const groupKey = (city: string) => (!city ? '0' : firstVisit(city) ? `1${firstVisit(city)}` : '2')
+  backupGroups.sort((a, b) => groupKey(a.city).localeCompare(groupKey(b.city)) || a.city.localeCompare(b.city))
+  const backupCount = backupGroups.reduce((n, g) => n + g.places.length, 0)
   // What we didn't manage on this trip, waiting for a future one.
   const leftovers = data.places
     .filter(p => p.leftover)
@@ -97,7 +107,7 @@ export function Overview({
         onDelete={onDeleteTodo}
       />
 
-      {(backup.length > 0 || editMode) && (
+      {(backupCount > 0 || editMode) && (
         <>
           <h3 className="panel-sub">📌 Backup list</h3>
           <p className="hint">
@@ -106,15 +116,23 @@ export function Overview({
           </p>
         </>
       )}
-      <PlaceList
-        places={backup}
-        stays={stays}
-        editMode={editMode}
-        onEditPlace={onEditPlace}
-        onDeletePlace={onDeletePlace}
-        onToggleLeftover={onToggleLeftover}
-        onToTodo={onPlaceToTodo}
-      />
+      {backupGroups.map(g => (
+        <div key={g.city} className="place-group">
+          <h4 className="place-group-title">
+            {g.color ? <span className="tag-dot" style={{ background: g.color }} /> : '🌍 '}
+            {g.city || 'Anywhere'}
+            <span className="place-group-count">{g.places.length}</span>
+          </h4>
+          <PlaceList
+            places={g.places}
+            editMode={editMode}
+            onEditPlace={onEditPlace}
+            onDeletePlace={onDeletePlace}
+            onToggleLeftover={onToggleLeftover}
+            onToTodo={onPlaceToTodo}
+          />
+        </div>
+      ))}
 
       {(leftovers.length > 0 || editMode) && (
         <>
