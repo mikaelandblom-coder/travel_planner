@@ -931,6 +931,88 @@ h3.row-title { font-size: 1rem; }
 
 .field-row .field:has(.emoji-input) { flex: 0 0 auto; }
 
+/* The emoji field is a button that opens an in-app picker (iPad Safari
+   can't be made to open its emoji keyboard). */
+.emoji-btn {
+  height: 42px;
+  font-family: var(--font);
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 0;
+}
+
+.emoji-btn.empty { opacity: 0.45; }
+.emoji-btn.open { border-color: var(--accent); background: var(--accent-soft); opacity: 1; }
+
+.emoji-panel {
+  margin: -4px 0 12px;
+  padding: 8px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #faf6f0;
+}
+
+.emoji-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--line);
+}
+
+.emoji-tab {
+  flex: none;
+  width: 38px;
+  height: 34px;
+  font-size: 1.1rem;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.emoji-tab.active { border-color: var(--accent); background: var(--accent-soft); }
+
+.emoji-page-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 6px 2px 4px;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  max-height: 200px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.emoji-cell {
+  height: 40px;
+  font-size: 1.45rem;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.emoji-cell:hover, .emoji-cell.active { background: var(--accent-soft); }
+
+.emoji-panel-foot {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.emoji-panel-foot input { flex: 1; min-width: 0; }
+
 .swatches {
   display: flex;
   gap: 8px;
