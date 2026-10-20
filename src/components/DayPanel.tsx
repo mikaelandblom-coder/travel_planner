@@ -41,26 +41,14 @@ export function Overview({
   onToggleLeftover, onCarryOver, onAddTodo, onSaveTodo, onDeleteTodo, onPlaceToTodo,
 }: OverviewProps) {
   const stays = [...data.stays].sort((a, b) => a.start_date.localeCompare(b.start_date))
-  const stayStart = (p: Place) => stays.find(s => s.id === p.stay_id)?.start_date ?? ''
-  // The backup list: everything not yet allocated to a day, grouped by city
-  // (a stay's city wins over the place's own). General ideas first, then the
-  // trip's cities in the order we first get there, then other cities A–Z.
-  const cityOf = (p: Place) => stays.find(s => s.id === p.stay_id)?.location_name ?? p.city
-  const firstVisit = (city: string) => stays.find(s => s.location_name === city)?.start_date
-  const backupGroups: { city: string; color: string | null; places: Place[] }[] = []
-  for (const p of data.places.filter(p => !p.date && !p.leftover)) {
-    const city = cityOf(p)
-    const group = backupGroups.find(g => g.city === city)
-    if (group) group.places.push(p)
-    else backupGroups.push({ city, color: stays.find(s => s.location_name === city)?.color ?? null, places: [p] })
-  }
-  const groupKey = (city: string) => (!city ? '0' : firstVisit(city) ? `1${firstVisit(city)}` : '2')
-  backupGroups.sort((a, b) => groupKey(a.city).localeCompare(groupKey(b.city)) || a.city.localeCompare(b.city))
+  // The backup list: everything not yet allocated to a day.
+  const backupGroups = groupByCity(data.places.filter(p => !p.date && !p.leftover), stays)
   const backupCount = backupGroups.reduce((n, g) => n + g.places.length, 0)
   // What we didn't manage on this trip, waiting for a future one.
-  const leftovers = data.places
-    .filter(p => p.leftover)
-    .sort((a, b) => stayStart(a).localeCompare(stayStart(b)) || a.name.localeCompare(b.name))
+  const leftoverGroups = groupByCity(
+    data.places.filter(p => p.leftover).sort((a, b) => a.name.localeCompare(b.name)),
+    stays,
+  )
 
   return (
     <aside className="panel card">
@@ -116,25 +104,16 @@ export function Overview({
           </p>
         </>
       )}
-      {backupGroups.map(g => (
-        <div key={g.city} className="place-group">
-          <h4 className="place-group-title">
-            {g.color ? <span className="tag-dot" style={{ background: g.color }} /> : '🌍 '}
-            {g.city || 'Anywhere'}
-            <span className="place-group-count">{g.places.length}</span>
-          </h4>
-          <PlaceList
-            places={g.places}
-            editMode={editMode}
-            onEditPlace={onEditPlace}
-            onDeletePlace={onDeletePlace}
-            onToggleLeftover={onToggleLeftover}
-            onToTodo={onPlaceToTodo}
-          />
-        </div>
-      ))}
+      <GroupedPlaceList
+        groups={backupGroups}
+        editMode={editMode}
+        onEditPlace={onEditPlace}
+        onDeletePlace={onDeletePlace}
+        onToggleLeftover={onToggleLeftover}
+        onToTodo={onPlaceToTodo}
+      />
 
-      {(leftovers.length > 0 || editMode) && (
+      {(leftoverGroups.length > 0 || editMode) && (
         <>
           <h3 className="panel-sub">🌱 Next time</h3>
           <p className="hint">
@@ -143,9 +122,8 @@ export function Overview({
           </p>
         </>
       )}
-      <PlaceList
-        places={leftovers}
-        stays={stays}
+      <GroupedPlaceList
+        groups={leftoverGroups}
         editMode={editMode}
         onEditPlace={onEditPlace}
         onDeletePlace={onDeletePlace}
@@ -440,9 +418,45 @@ function TodoList({ todos, editMode, onAdd, onSave, onDelete }: {
   )
 }
 
-function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace, onToggleLeftover, onToTodo }: {
+type CityGroup = { city: string; color: string | null; places: Place[] }
+
+/**
+ * Places grouped by city (a stay's city wins over the place's own), keeping
+ * the given order within each group. General ideas first, then the trip's
+ * cities in the order we first get there, then other cities A–Z.
+ */
+function groupByCity(places: Place[], stays: Stay[]): CityGroup[] {
+  const groups: CityGroup[] = []
+  for (const p of places) {
+    const city = stays.find(s => s.id === p.stay_id)?.location_name ?? p.city
+    const group = groups.find(g => g.city === city)
+    if (group) group.places.push(p)
+    else groups.push({ city, color: stays.find(s => s.location_name === city)?.color ?? null, places: [p] })
+  }
+  const firstVisit = (city: string) => stays.find(s => s.location_name === city)?.start_date
+  const key = (city: string) => (!city ? '0' : firstVisit(city) ? `1${firstVisit(city)}` : '2')
+  return groups.sort((a, b) => key(a.city).localeCompare(key(b.city)) || a.city.localeCompare(b.city))
+}
+
+function GroupedPlaceList({ groups, ...rest }: { groups: CityGroup[] } & Omit<Parameters<typeof PlaceList>[0], 'places'>) {
+  return (
+    <>
+      {groups.map(g => (
+        <div key={g.city} className="place-group">
+          <h4 className="place-group-title">
+            {g.color ? <span className="tag-dot" style={{ background: g.color }} /> : '🌍 '}
+            {g.city || 'Anywhere'}
+            <span className="place-group-count">{g.places.length}</span>
+          </h4>
+          <PlaceList places={g.places} {...rest} />
+        </div>
+      ))}
+    </>
+  )
+}
+
+function PlaceList({ places, editMode, onEditPlace, onDeletePlace, onToggleLeftover, onToTodo }: {
   places: Place[]
-  stays?: Stay[] // when given, rows show which stay each place belongs to
   editMode: boolean
   onEditPlace: (place?: Place, defaultStayId?: string | null, defaultDate?: string | null) => void
   onDeletePlace: (p: Place) => void
@@ -454,19 +468,15 @@ function PlaceList({ places, stays, editMode, onEditPlace, onDeletePlace, onTogg
   return (
     <ul className="places">
       {places.map(p => {
-        const stay = stays?.find(s => s.id === p.stay_id)
         return (
           <li key={p.id} className={p.leftover ? 'leftover' : undefined}>
             <span className="place-emoji">{placeEmoji(p)}</span>
             <span className="row-main">
               <span className="row-title">{p.name}</span>
-              {(p.date || timeRange(p) || stay || p.notes) && (
+              {(p.date || timeRange(p) || p.notes) && (
                 <span className="row-sub sub-bits">
                   {p.date && <span>📅 {fmtShort(p.date)}</span>}
                   {timeRange(p) && <span>🕐 {timeRange(p)}</span>}
-                  {stay && (
-                    <span><span className="tag-dot" style={{ background: stay.color }} />{stay.location_name}</span>
-                  )}
                   {p.notes && <span>{p.notes}</span>}
                 </span>
               )}
