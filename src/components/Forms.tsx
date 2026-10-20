@@ -3,6 +3,7 @@ import type { City, Leg, Place, Stay, Trip, TravelMode } from '../types'
 import { MODES, PLACE_CATEGORIES, STAY_COLORS } from '../types'
 import { addDays, fmtShort } from '../lib/dates'
 import { supabase } from '../supabaseClient'
+import { EMOJI_PAGES } from '../data/emojis'
 
 export function Modal({ title, onClose, children }: {
   title: string
@@ -17,6 +18,69 @@ export function Modal({ title, onClose, children }: {
           <button className="icon-btn" onClick={onClose} title="Close">✕</button>
         </div>
         {children}
+      </div>
+    </div>
+  )
+}
+
+// The button that shows the chosen emoji and opens/closes the picker.
+function EmojiButton({ value, placeholder, open, onToggle }: {
+  value: string
+  placeholder: string
+  open: boolean
+  onToggle: () => void
+}) {
+  return (
+    <button
+      type="button"
+      className={'emoji-input emoji-btn' + (open ? ' open' : '') + (value ? '' : ' empty')}
+      onClick={onToggle}
+      title="Choose an emoji"
+    >{value || placeholder}</button>
+  )
+}
+
+// A paged emoji grid, shown under the field row. The text box at the
+// bottom still takes any emoji typed or pasted from the system keyboard.
+function EmojiPanel({ value, onPick, onClose }: {
+  value: string
+  onPick: (emoji: string) => void
+  onClose: () => void
+}) {
+  const [page, setPage] = useState(EMOJI_PAGES[0].id)
+  const current = EMOJI_PAGES.find(p => p.id === page) ?? EMOJI_PAGES[0]
+  return (
+    <div className="emoji-panel">
+      <div className="emoji-tabs">
+        {EMOJI_PAGES.map(p => (
+          <button
+            type="button"
+            key={p.id}
+            className={'emoji-tab' + (p.id === page ? ' active' : '')}
+            onClick={() => setPage(p.id)}
+            title={p.label}
+          >{p.icon}</button>
+        ))}
+      </div>
+      <div className="emoji-page-label">{current.label}</div>
+      <div className="emoji-grid">
+        {current.emojis.split(' ').map(e => (
+          <button
+            type="button"
+            key={e}
+            className={'emoji-cell' + (e === value ? ' active' : '')}
+            onClick={() => { onPick(e); onClose() }}
+          >{e}</button>
+        ))}
+      </div>
+      <div className="emoji-panel-foot">
+        <input
+          value={value}
+          onChange={e => onPick(e.target.value)}
+          maxLength={4}
+          placeholder="Or type one"
+        />
+        <button type="button" className="btn small" onClick={onClose}>Done</button>
       </div>
     </div>
   )
@@ -117,6 +181,7 @@ export function TripForm({ initial, onSave, onDelete }: {
 }) {
   const [name, setName] = useState(initial?.name ?? '')
   const [emoji, setEmoji] = useState(initial?.emoji ?? '🌏')
+  const [picking, setPicking] = useState(false)
   const [start, setStart] = useState(initial?.start_date ?? '')
   const [end, setEnd] = useState(initial?.end_date ?? '')
 
@@ -130,13 +195,15 @@ export function TripForm({ initial, onSave, onDelete }: {
   return (
     <form onSubmit={submit}>
       <div className="field-row">
-        <Field label="Emoji">
-          <input className="emoji-input" value={emoji} onChange={e => setEmoji(e.target.value)} maxLength={4} />
-        </Field>
+        <div className="field">
+          <span className="field-label">Emoji</span>
+          <EmojiButton value={emoji} placeholder="🧳" open={picking} onToggle={() => setPicking(!picking)} />
+        </div>
         <Field label="Trip name">
           <input value={name} onChange={e => setName(e.target.value)} required placeholder="Vietnam & Japan" />
         </Field>
       </div>
+      {picking && <EmojiPanel value={emoji} onPick={setEmoji} onClose={() => setPicking(false)} />}
       <div className="field-row">
         <Field label="First day">
           <input type="date" value={start} onChange={e => setStart(e.target.value)} required />
@@ -349,6 +416,7 @@ export function PlaceForm({ initial, stays, cities, defaultStayId, defaultDate, 
   const [name, setName] = useState(initial?.name ?? '')
   const [category, setCategory] = useState(initial?.category ?? 'sight')
   const [emoji, setEmoji] = useState(initial?.emoji ?? '')
+  const [picking, setPicking] = useState(false)
   const [stayId, setStayId] = useState<string>(initial?.stay_id ?? defaultStayId ?? '')
   const [city, setCity] = useState(initial?.city ?? '')
   const [date, setDate] = useState(initial?.date ?? defaultDate ?? '')
@@ -399,17 +467,12 @@ export function PlaceForm({ initial, stays, cities, defaultStayId, defaultDate, 
             ))}
           </div>
         </Field>
-        <Field label="Own emoji">
-          <input
-            className="emoji-input"
-            value={emoji}
-            onChange={e => setEmoji(e.target.value)}
-            maxLength={4}
-            placeholder="🎡"
-            title="Paste any emoji (Win + .) to use instead of a type above"
-          />
-        </Field>
+        <div className="field">
+          <span className="field-label">Own emoji</span>
+          <EmojiButton value={emoji} placeholder="🎡" open={picking} onToggle={() => setPicking(!picking)} />
+        </div>
       </div>
+      {picking && <EmojiPanel value={emoji} onPick={setEmoji} onClose={() => setPicking(false)} />}
       <div className="field-row">
         <Field label="Part of stay">
           <select value={stayId} onChange={e => setStayId(e.target.value)}>
