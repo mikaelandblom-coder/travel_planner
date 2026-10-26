@@ -8,6 +8,14 @@
     "created_at": "2026-10-18T17:35:16.472664+00:00"
   },
   {
+    "id": "12871906-ec69-4fcf-a836-d2b1c1171219",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "text": "Köp Grab tröja till Temin",
+    "notes": "",
+    "done": false,
+    "created_at": "2026-10-20T17:30:05.747164+00:00"
+  },
+  {
     "id": "1a56a8e5-65b5-4971-8487-035ec2b80dee",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
     "text": "Köp födelsedagspresent till mamma vn",
@@ -118,6 +126,14 @@
     "notes": "",
     "done": false,
     "created_at": "2026-10-18T17:34:06.088859+00:00"
+  },
+  {
+    "id": "e8210d72-19b7-4e11-b7c8-d8174076d083",
+    "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
+    "text": "Köp i Japan: halsontspray, kollagendricka, underfoten",
+    "notes": "",
+    "done": false,
+    "created_at": "2026-10-21T06:04:04.868987+00:00"
   },
   {
     "id": "e9bbcb39-fc06-4fe1-b97c-2e4d6f7cadc3",
