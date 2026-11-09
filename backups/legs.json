@@ -15,15 +15,15 @@
   {
     "id": "1a08eeb2-5e75-49b4-8859-0dbbdbba9f11",
     "trip_id": "404ee42a-e1f2-4ef0-a64f-fe6067953c6f",
-    "date": "2026-12-09",
+    "date": "2026-12-10",
     "from_name": "Saigon",
     "to_name": "Stockholm",
     "mode": "flight",
     "notes": "Micke åker hem. Flyget går 00:20 den 10e så vi behöver åka till flygplatsen den 9e",
     "created_at": "2026-07-12T14:35:07.690643+00:00",
     "arrive_date": null,
-    "depart_time": null,
-    "arrive_time": null
+    "depart_time": "00:20:00",
+    "arrive_time": "14:05:00"
   },
   {
     "id": "307600cd-0787-48af-9537-7f6b5730a7c5",
@@ -126,8 +126,8 @@
     "notes": "",
     "created_at": "2026-07-12T08:22:48.107414+00:00",
     "arrive_date": null,
-    "depart_time": null,
-    "arrive_time": null
+    "depart_time": "09:30:00",
+    "arrive_time": "14:05:00"
   },
   {
     "id": "c9a1c907-30af-4773-a857-a35a2d5449c2",
