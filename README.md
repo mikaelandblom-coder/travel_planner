@@ -26,6 +26,11 @@ A cute, minimal travel planner for two — first stop: **Vietnam & Japan, Nov–
   those ideas along when a later trip goes to the same city.
 - **View & edit modes**: anyone with the link can look, only we can edit
   (Supabase password login + row-level security).
+- **Picks up where you left off**: the open trip, day and scroll position are
+  remembered in the browser, so coming back to the tab later (even after the
+  phone reloaded it) lands on the same spot.
+- **Phone-friendly popups**: on a phone, the day popup and forms fill the
+  screen and scroll as a whole, with the ‹ › ✕ buttons always at the top.
 - **Multi-trip**: built for future adventures too.
 - Hosted free on **GitHub Pages**, data in **Supabase**, offline read cache
   for when we're actually travelling.

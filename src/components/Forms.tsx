@@ -1,9 +1,62 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import type { City, Leg, Place, Stay, Trip, TravelMode } from '../types'
 import { MODES, PLACE_CATEGORIES, STAY_COLORS } from '../types'
 import { addDays, fmtShort } from '../lib/dates'
 import { supabase } from '../supabaseClient'
 import { EMOJI_PAGES } from '../data/emojis'
+
+/**
+ * The dimmed backdrop + box every popup sits in.
+ *
+ * On a phone, a planner wider than the screen gets pinch-zoomed out to see
+ * it all — and a normal fixed popup then shows up tiny. So while zoomed, the
+ * backdrop is laid over exactly the visible part of the page and scaled
+ * back up, so the popup always looks like it's at normal zoom.
+ */
+export function Overlay({ className, onClose, children }: {
+  className?: string
+  onClose: () => void
+  children: ReactNode
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const vv = window.visualViewport
+    const el = ref.current
+    if (!vv || !el) return
+    const fit = () => {
+      const s = vv.scale
+      if (Math.abs(s - 1) < 0.02) {
+        el.removeAttribute('style')
+        return
+      }
+      Object.assign(el.style, {
+        inset: 'auto',
+        left: vv.offsetLeft + 'px',
+        top: vv.offsetTop + 'px',
+        width: vv.width * s + 'px',
+        height: vv.height * s + 'px',
+        transform: `scale(${1 / s})`,
+        transformOrigin: '0 0',
+      })
+    }
+    fit()
+    vv.addEventListener('resize', fit)
+    vv.addEventListener('scroll', fit)
+    return () => {
+      vv.removeEventListener('resize', fit)
+      vv.removeEventListener('scroll', fit)
+    }
+  }, [])
+
+  return (
+    <div ref={ref} className="overlay" onMouseDown={onClose}>
+      <div className={'modal card' + (className ? ' ' + className : '')} onMouseDown={e => e.stopPropagation()}>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 export function Modal({ title, onClose, children }: {
   title: string
@@ -11,15 +64,13 @@ export function Modal({ title, onClose, children }: {
   children: ReactNode
 }) {
   return (
-    <div className="overlay" onMouseDown={onClose}>
-      <div className="modal card" onMouseDown={e => e.stopPropagation()}>
-        <div className="modal-head">
-          <h3>{title}</h3>
-          <button className="icon-btn" onClick={onClose} title="Close">✕</button>
-        </div>
-        {children}
+    <Overlay onClose={onClose}>
+      <div className="modal-head">
+        <h3>{title}</h3>
+        <button className="icon-btn" onClick={onClose} title="Close">✕</button>
       </div>
-    </div>
+      {children}
+    </Overlay>
   )
 }
 

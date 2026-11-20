@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createStore } from './data/store'
 import { supabase } from './supabaseClient'
 import {
@@ -26,14 +26,42 @@ const errMsg = (e: unknown): string =>
 
 const uid = () => crypto.randomUUID()
 
+/**
+ * Where you were (open trip, open day, scroll position), kept in the browser
+ * so that a phone reloading the tab after it was in the background — or
+ * opening the planner again later — lands back on the same spot instead of
+ * the start page.
+ */
+type ViewState = { tripId: string | null; date: string | null; scrollY: number }
+const VIEW_KEY = 'travel-planner:view'
+
+function loadView(): ViewState {
+  try {
+    const v = JSON.parse(localStorage.getItem(VIEW_KEY) ?? 'null')
+    if (v && typeof v === 'object') {
+      return {
+        tripId: typeof v.tripId === 'string' ? v.tripId : null,
+        date: typeof v.date === 'string' ? v.date : null,
+        scrollY: typeof v.scrollY === 'number' ? v.scrollY : 0,
+      }
+    }
+  } catch { /* storage blocked or corrupt: start fresh */ }
+  return { tripId: null, date: null, scrollY: 0 }
+}
+
+function saveView(v: ViewState) {
+  try { localStorage.setItem(VIEW_KEY, JSON.stringify(v)) } catch { /* ignore */ }
+}
+
 export default function App() {
   const store = useMemo(() => createStore(), [])
+  const [initialView] = useState(loadView)
   const [trips, setTrips] = useState<Trip[] | null>(null)
-  const [tripId, setTripId] = useState<string | null>(null)
+  const [tripId, setTripId] = useState<string | null>(initialView.tripId)
   const [data, setData] = useState<TripData>(EMPTY_TRIP_DATA)
   const [leftovers, setLeftovers] = useState<Place[]>([])
   const [cities, setCities] = useState<City[]>([])
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(initialView.date)
   const [editMode, setEditMode] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [isEditor, setIsEditor] = useState(false)
@@ -52,7 +80,8 @@ export default function App() {
       setTrips(list)
       setOffline(store.offline)
       setLoadError(null)
-      // No auto-open: the start page is the trip picker.
+      // No auto-open beyond the trip you were last looking at: the start
+      // page is the trip picker.
       setTripId(prev => (prev && list.some(t => t.id === prev)) ? prev : null)
     } catch (e) {
       setTrips([])
@@ -60,11 +89,19 @@ export default function App() {
     }
   }, [store])
 
+  // The scroll position to go back to once the remembered trip has drawn.
+  const pendingScroll = useRef(initialView.tripId ? initialView.scrollY : 0)
+
   const refreshData = useCallback(async () => {
     if (!tripId) { setData(EMPTY_TRIP_DATA); return }
     try {
       setData(await store.loadTrip(tripId))
       setOffline(store.offline)
+      if (pendingScroll.current) {
+        const y = pendingScroll.current
+        pendingScroll.current = 0
+        requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)))
+      }
     } catch (e) {
       setLoadError(errMsg(e))
     }
@@ -86,6 +123,36 @@ export default function App() {
   useEffect(() => { void refreshData() }, [refreshData])
   useEffect(() => { void refreshLeftovers() }, [refreshLeftovers])
   useEffect(() => { void refreshCities() }, [refreshCities])
+
+  // Remember where you are, so coming back to the tab later (even after the
+  // phone threw it away) opens the same trip and day.
+  useEffect(() => {
+    if (trips === null) return // a trip being restored isn't confirmed yet
+    saveView({ ...loadView(), tripId, date: tripId ? selectedDate : null })
+  }, [trips, tripId, selectedDate])
+
+  useEffect(() => {
+    const save = () => {
+      const v = loadView()
+      saveView({ ...v, scrollY: window.scrollY })
+    }
+    const onHide = () => { if (document.visibilityState === 'hidden') save() }
+    document.addEventListener('visibilitychange', onHide)
+    window.addEventListener('pagehide', save)
+    return () => {
+      document.removeEventListener('visibilitychange', onHide)
+      window.removeEventListener('pagehide', save)
+    }
+  }, [])
+
+  // While a popup is open the page behind it stays put — on a phone, swiping
+  // scrolls the popup, not the calendar underneath.
+  const popupOpen = Boolean(modal || (trip && selectedDate))
+  useEffect(() => {
+    if (!popupOpen) return
+    document.documentElement.classList.add('popup-open')
+    return () => document.documentElement.classList.remove('popup-open')
+  }, [popupOpen])
 
   // Pick up edits made on another device when returning to the tab.
   useEffect(() => {
@@ -124,6 +191,7 @@ export default function App() {
   function openTrip(t: Trip) {
     setTripId(t.id)
     setSelectedDate(null)
+    window.scrollTo(0, 0)
   }
 
   function closeTrip() {
