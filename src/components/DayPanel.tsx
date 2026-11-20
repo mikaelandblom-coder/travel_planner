@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Leg, Place, Stay, Todo, Trip, TripData } from '../types'
 import { modeEmoji, placeEmoji, timeKey, timeRange } from '../types'
 import { addDays, daysBetween, fmtLong, fmtShort } from '../lib/dates'
+import { Overlay } from './Forms'
 
 type Props = {
   trip: Trip
@@ -183,11 +184,9 @@ type DayProps = Props & {
 /** A day's details in a popup over the calendar. */
 export function DayModal(props: DayProps) {
   return (
-    <div className="overlay" onMouseDown={() => props.onSelectDate(null)}>
-      <div className="modal day-modal card" onMouseDown={e => e.stopPropagation()}>
-        <DayView {...props} />
-      </div>
-    </div>
+    <Overlay className="day-modal" onClose={() => props.onSelectDate(null)}>
+      <DayView {...props} />
+    </Overlay>
   )
 }
 

@@ -875,11 +875,51 @@ h3.row-title { font-size: 1rem; }
   width: 100%;
   max-width: 440px;
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 18px 20px 20px;
 }
 
 .modal.day-modal { max-width: 560px; }
+
+/* The page behind an open popup stays put. */
+html.popup-open,
+html.popup-open body { overflow: hidden; }
+
+/* The day's title and ‹ › ✕ stay in reach while scrolling a long day. */
+.day-modal > .panel-head,
+.modal > .modal-head {
+  position: sticky;
+  top: -18px;
+  z-index: 2;
+  margin: -18px -20px 10px;
+  padding: 18px 20px 8px;
+  background: var(--card);
+}
+
+/* Phones: popups become a full-screen sheet, so the whole screen scrolls
+   instead of a small box in the middle. */
+@media (max-width: 600px) {
+  .overlay { padding: 0; align-items: stretch; }
+  .modal,
+  .modal.day-modal {
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    border-radius: 0;
+    padding: 14px 16px calc(24px + env(safe-area-inset-bottom));
+  }
+  .day-modal > .panel-head,
+  .modal > .modal-head {
+    top: -14px;
+    margin: -14px -16px 10px;
+    padding: calc(14px + env(safe-area-inset-top)) 16px 8px;
+  }
+  .day-nav .icon-btn,
+  .modal-head .icon-btn { font-size: 1.3rem; width: 40px; height: 40px; }
+}
 
 .day-nav {
   display: inline-flex;
